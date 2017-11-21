@@ -4,6 +4,7 @@ import json
 
 DATA_WIDTH = 75
 DATA_HEIGHT = 75
+DATA_CHANNELS = 2
 
 def ScaleArrayToNormalImageValue(array, maxValue_, minValue_):
 	scale = 255. / (maxValue_ - minValue_)
@@ -120,7 +121,6 @@ class StatoilDataReader:
 		maxHV = max(listOfMaxHV)
 		minHV = min(listOfMinHV)
 
-		print("\t\t(maxHH, minHH, maxHV, minHV) = ("+str(maxHH)+", "+str(minHH)+", "+str(maxHV)+", "+str(minHV)+")")
 		return maxHH, minHH, maxHV, minHV
 
 	def normalizeRadarImageList(self, listOfRadarImage_, maxHH_, minHH_, maxHV_, minHV_):
