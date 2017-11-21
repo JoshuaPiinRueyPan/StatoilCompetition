@@ -4,14 +4,14 @@ import json
 import numpy as np
 from random import shuffle
 
-learning_rate = 0.001
-training_iters = 840
+learning_rate = 0.0001
+training_iters = 20000
 batch_size = 100
-display_step = 10
+display_step = 1000
 
 n_input = 75*75*2
 n_classes = 2
-dropout = 0.75
+dropout = 0.5
 
 numberoftrainingdata = 1400
 
@@ -21,8 +21,13 @@ with open("train.json","r") as f:
     #print(type(load_dict[1]))
     #print(len(load_dict[1]))
     #print(load_dict[1].keys())
-    train_dict = load_dict[:1400]
-    validation_dict = load_dict[1400:]
+    train_dict = load_dict[200:]
+    validation_dict = load_dict[:200]
+
+maxnumber1 = 34.5749
+minnumber1 = -45.5944
+maxnumber2 = 20.1542
+minnumber2 = -45.6555
 
 shuffle(train_dict)
 
@@ -35,8 +40,10 @@ def get_batch(load_dict, batch_size, step):
         #idx = ((step-1)*batch_size+i) % numberoftrainingdata
         x_list = []            
         for j in range(75*75):
-            x_list.append(load_dict[idx]['band_1'][j])
-            x_list.append(load_dict[idx]['band_2'][j])
+            x_list.append((load_dict[idx]['band_1'][j]-minnumber1)/(maxnumber1-minnumber1))
+            x_list.append((load_dict[idx]['band_2'][j]-minnumber2)/(maxnumber2-minnumber2))
+            #x_list.append(load_dict[idx]['band_1'][j]/100.+0.5)
+            #x_list.append(load_dict[idx]['band_2'][j]/100.+0.5)
         x_array = np.array(x_list)
         batch_x_list.append(x_array)
 
@@ -50,7 +57,7 @@ def get_batch(load_dict, batch_size, step):
         if load_dict[idx]['inc_angle'] != 'na':
             batch_x_angle_list.append(np.array([load_dict[idx]['inc_angle']], np.float32))
         else:
-            batch_x_angle_list.append([39.26])
+            batch_x_angle_list.append([-1])#39.26
     #print(batch_x_list)
 
     return (np.array(batch_x_list), np.array(batch_x_angle_list), np.array(batch_y_list))
@@ -72,23 +79,23 @@ y = tf.placeholder(tf.float32, [None, n_classes])
 keep_prob = tf.placeholder(tf.float32)
 
 weights = {
-    'convW1': tf.Variable(tf.random_normal([3, 3, 2, 8])),
-    'convW2': tf.Variable(tf.random_normal([3, 3, 8, 16])),
-    'convW3': tf.Variable(tf.random_normal([3, 3, 16, 16])),
-    'convW4': tf.Variable(tf.random_normal([3, 3, 16, 16])),
-    'fcW1'  : tf.Variable(tf.random_normal([5*5*16+1, 256])),
-    'fcW2'  : tf.Variable(tf.random_normal([256, 256])),
-    'output': tf.Variable(tf.random_normal([256, n_classes])),
+    'convW1': tf.Variable(tf.random_normal([3, 3, 2, 8], stddev=0.01)),
+    'convW2': tf.Variable(tf.random_normal([3, 3, 8, 16], stddev=0.01)),
+    'convW3': tf.Variable(tf.random_normal([3, 3, 16, 16], stddev=0.01)),
+    'convW4': tf.Variable(tf.random_normal([3, 3, 16, 16], stddev=0.01)),
+    'fcW1'  : tf.Variable(tf.random_normal([5*5*16+1, 128], stddev=0.01)),
+    'fcW2'  : tf.Variable(tf.random_normal([128, 128], stddev=0.01)),
+    'output': tf.Variable(tf.random_normal([128, n_classes], stddev=0.01)),
 }
 
 biases = {
-    'convb1': tf.Variable(tf.random_normal([8])),
-    'convb2': tf.Variable(tf.random_normal([16])),
-    'convb3': tf.Variable(tf.random_normal([16])),
-    'convb4': tf.Variable(tf.random_normal([16])),
-    'fcb1'  : tf.Variable(tf.random_normal([256])),
-    'fcb2'  : tf.Variable(tf.random_normal([256])),
-    'output'  : tf.Variable(tf.random_normal([n_classes])),
+    'convb1': tf.Variable(tf.random_normal([8], stddev=0.01)),
+    'convb2': tf.Variable(tf.random_normal([16], stddev=0.01)),
+    'convb3': tf.Variable(tf.random_normal([16], stddev=0.01)),
+    'convb4': tf.Variable(tf.random_normal([16], stddev=0.01)),
+    'fcb1'  : tf.Variable(tf.random_normal([128], stddev=0.01)),
+    'fcb2'  : tf.Variable(tf.random_normal([128], stddev=0.01)),
+    'output'  : tf.Variable(tf.random_normal([n_classes], stddev=0.01)),
 }
 
 def myNet(x_img, x_angle, weights, biases, dropout):
@@ -96,17 +103,21 @@ def myNet(x_img, x_angle, weights, biases, dropout):
 
     conv1 = convlayer('conv1', inputx, weights['convW1'], biases['convb1'])
     pool1 = maxpool('pool1', conv1, k=2)
+    norm1 = norm('norm1', pool1, lsize=4)
     
-    conv2 = convlayer('conv2', pool1, weights['convW2'], biases['convb2'])
+    conv2 = convlayer('conv2', norm1, weights['convW2'], biases['convb2'])
     pool2 = maxpool('pool2', conv2, k=2)
+    norm2 = norm('norm3', pool2, lsize=4)
 
-    conv3 = convlayer('conv3', pool2, weights['convW3'], biases['convb3'])
+    conv3 = convlayer('conv3', norm2, weights['convW3'], biases['convb3'])
     pool3 = maxpool('pool3', conv3, k=2)
+    norm3 = norm('norm3', pool3, lsize=4)
 
-    conv4 = convlayer('conv4', pool3, weights['convW4'], biases['convb4'], padding='VALID')
+    conv4 = convlayer('conv4', norm3, weights['convW4'], biases['convb4'], padding='VALID')
     pool4 = maxpool('pool4', conv4, k=2)
+    norm4 = norm('norm4', pool4, lsize=4)
 
-    pool4reshape = tf.reshape(pool4, [-1, weights['fcW1'].get_shape().as_list()[0]-1])
+    pool4reshape = tf.reshape(norm4, [-1, weights['fcW1'].get_shape().as_list()[0]-1])
     concat = tf.concat(axis=1, values=[pool4reshape, x_angle])
 
     fc1 = tf.add(tf.matmul(concat, weights['fcW1']), biases['fcb1'])
@@ -152,9 +163,10 @@ with tf.Session() as sess:
             loss, accuracy = sess.run( [cost, accuracy_rate], feed_dict={x_img:validation_x, x_angle:validation_x_angle, y: validation_y, keep_prob: 1.})
             print("validation:")
             print("loss: " + str(loss) + ", accuracy: " + str(accuracy))
+            if step >= 10000:
+                saver.save(sess, "save_step"+ str(step) + "/iceberg.ckpt")
         step += 1
         #print("step"+str(step)+" complete!")
-    saver.save(sess, "save3/iceberg.ckpt")
     print("Optimization finished!")
 
 
