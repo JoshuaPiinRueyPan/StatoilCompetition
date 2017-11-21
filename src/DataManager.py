@@ -15,6 +15,7 @@ class DataManager:
 		self.listOfTrainingData = self.listOfRadarImages[NUMBER_OF_VALIDATION_DATA : ]
 
 	def GetTrainingBatch(self, BATCH_SIZE_):
+		self.isNewEpoch = False
 		arrayOfImages = np.zeros( (BATCH_SIZE_, DATA_WIDTH, DATA_HEIGHT, 2) )
 		arrayOfAngles = np.zeros( (BATCH_SIZE_, 1) )
 		arrayOfLabels = np.zeros( (BATCH_SIZE_, 2) )
@@ -32,7 +33,6 @@ class DataManager:
 			outputIndex += 1
 			self.cursor += 1
 			self.step += 1
-			self.isNewEpoch = False
 			if self.cursor >= len(self.listOfTrainingData):
 				shuffle(self.listOfTrainingData)
 				self.cursor = 0
