@@ -1,0 +1,6 @@
+# ignore binary
+*.pyc
+
+# ignore data
+*.jpg
+data/
