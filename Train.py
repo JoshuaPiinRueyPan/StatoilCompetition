@@ -13,6 +13,7 @@ n_input = 75*75*2
 n_classes = 2
 dropout = 0.5
 
+TRAINING_SET = "data/train.json"
 NUMBER_OF_VALIDATION = 200
 
 with open("train.json","r") as f:

@@ -33,26 +33,33 @@ class RadarImage:
 			normalImage = cv2.cvtColor(singleChannelImage, cv2.COLOR_GRAY2BGR)
 			return normalImage
 
-	def GetTotalImage(self):
+	def GetTotalImage(self, shouldConcatenateAngle_=True):
 		if not self.isNormalized:
 			raise UserWarning("You should Normalize RadarImage before you use it!")
 		else:
 			stuffValue = 0
 			if self.hasAngle:
-				stuffValue = np.array(self.angle)
+				scaleAngle = 255./90.  # In theory, maxAngle = 90
+				stuffValue = (np.array(self.angle) * scaleAngle).astype(np.uint8)
 			else:
 				stuffValue = np.array(0)
 
 			imageHH = np.reshape(self.dataHH, (DATA_WIDTH, DATA_HEIGHT))
 			imageHV = np.reshape(self.dataHV, (DATA_WIDTH, DATA_HEIGHT))
-			imageAngleChannel = np.tile(stuffValue, (DATA_WIDTH, DATA_HEIGHT)).astype(np.uint8)
-			
-			temp = np.stack((imageHH, imageHV, imageAngleChannel))
-			'''
-			    After stacked, the shape will be: (3, 75, 75),
-			    we need to transpose it back.
-			'''
-			return np.transpose(temp, (1, 2, 0))
+
+			if shouldConcatenateAngle_:
+				imageAngleChannel = np.tile(stuffValue, (DATA_WIDTH, DATA_HEIGHT)).astype(np.uint8)
+				
+				temp = np.stack((imageHH, imageHV, imageAngleChannel))
+				'''
+				    After stacked, the shape will be: (3, 75, 75),
+				    we need to transpose it back.
+				'''
+				return np.transpose(temp, (1, 2, 0))
+
+			else:
+				temp = np.stack((imageHH, imageHV))
+				return np.transpose(temp, (1, 2, 0))
 
 	def __init__(self, statoilData_):
 		self.name = statoilData_["id"]
