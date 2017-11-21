@@ -81,8 +81,17 @@ if __name__ == "__main__":
 		summaryFilePathName = os.path.join(TARGET_DIR, "Summary.txt")
 		print("Write Summary to " + summaryFilePathName)
 		with open(summaryFilePathName, 'w') as summaryFile:
-			summaryFile.write("FileID \t\t IsIce \t\t Angle\n")
+			summaryFile.write("FileID \t\t Category \t\t Angle\n")
 			for each in listOfRadarImage:
-				info = each.name + "\t\t" + str(each.isIceberg) + "\t\t" + "{0:.2f}".format(each.angle) + "\n"
+				category = "?"
+				angle = "NA"
+				if each.hasAnswer:
+					if each.isIceberg:
+						category = "ice"
+					else:
+						category = "ship"
+				if each.hasAngle:
+					angle = "{0:.2f}".format(each.angle)
+				info = each.name + "\t\t" + str(category) + "\t\t" + angle + "\n"
 				summaryFile.write(info)
 			
