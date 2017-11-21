@@ -40,7 +40,16 @@ class DataDrawer:
 		return cv2.resize(image_, (self.SCALE_OF_TARGET_IMAGE*image_.shape[0], self.SCALE_OF_TARGET_IMAGE*image_.shape[1]) )
 
 	def appendInfoToImage(self, prefix_, image_, radarImage_):
-		imageInfo = prefix_  + ";  isIce: "  + str(radarImage_.isIceberg) + ";  angle: " + "{0:.2f}".format(radarImage_.angle)
+		categoryInfo = "?"
+		if radarImage_.hasAnswer:
+			if radarImage_.isIceberg:
+				categoryInfo = "ice"
+			else:
+				categoryInfo = "ship"
+		angleInfo = "NA"
+		if radarImage_.hasAngle:
+			angleInfo = "{0:.2f}".format(radarImage_.angle)
+		imageInfo = prefix_  + ";  "  + categoryInfo + ";  angle: " + angleInfo
 		cv2.putText(image_, imageInfo, (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2, cv2.CV_AA)
 
 	def saveEachRadarImage(self, TARGET_DIRECTORY_, radarImage_, imageHH_, imageHV_, imageTotal_):
