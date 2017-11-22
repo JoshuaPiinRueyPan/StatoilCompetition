@@ -21,7 +21,7 @@ This package provide some basic utilities (such as data loading, data drawing, a
 	$ cp settings/SubnetSettings.example  settings/SubnetSettings.py
 	$ cp settings/TrainingSettings.example  settings/TrainingSettings.py
 	```
-  As illustrate above, the files in settings/ will not upload to avoid conflict in version.  You need to write your customized settings in settings/*.py.  You can refer to settings/*.example to see how to write settings.
+  As illustrate above, the files in settings/ will not upload to avoid conflict in version.  You need to write your customized settings in settings/\*.py.  You can refer to settings/\*.example to see how to write settings.
 
 
 ## How to Customize Subnet
