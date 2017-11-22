@@ -1,0 +1,3 @@
+import os
+
+TESTING_SET_PATH_NAME = "data/test.json"

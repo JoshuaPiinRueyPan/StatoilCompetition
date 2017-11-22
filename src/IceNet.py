@@ -11,11 +11,14 @@ class IceNet:
 		self.inputAngle = tf.placeholder(tf.float32, [None, 1])
 		self.groundTruth = tf.placeholder(tf.float32, [None, outSettings.NUMBER_OF_CATEGORIES])
 
+		self.softmax = None
+
 		self.subnet = SubnetFactory(self.isTraining, self.inputImage, self.inputAngle, self.groundTruth)
 
 	def Build(self):
 
 		netOutput = self.subnet.Build()
+		self.softmax = tf.nn.softmax(netOutput)
 		cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=netOutput, labels=self.groundTruth))
 		accuracy = self.calculateAccuracy(netOutput, self.groundTruth)
 

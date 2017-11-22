@@ -14,6 +14,7 @@ class DataManager:
 		self.listOfValidationData = self.listOfRadarImages[ : NUMBER_OF_VALIDATION_DATA]
 		self.listOfTrainingData = self.listOfRadarImages[NUMBER_OF_VALIDATION_DATA : ]
 
+
 	def GetTrainingBatch(self, BATCH_SIZE_):
 		self.isNewEpoch = False
 		arrayOfImages = np.zeros( (BATCH_SIZE_, DATA_WIDTH, DATA_HEIGHT, 2) )
@@ -48,7 +49,7 @@ class DataManager:
 		arrayOfLabels = np.zeros( (NUMBER_OF_VALIDATION_DATA, 2) )
 
 		for i in range(NUMBER_OF_VALIDATION_DATA):
-			currentRadarImage = self.listOfTrainingData[i]
+			currentRadarImage = self.listOfValidationData[i]
 			arrayOfImages[i, :, :, :] = currentRadarImage.GetTotalImage(False)
 			arrayOfAngles[i, :] = currentRadarImage.angle
 			if currentRadarImage.hasAnswer:
@@ -58,4 +59,20 @@ class DataManager:
 					arrayOfLabels[i, :] = np.array([1., 0.])
 
 		return arrayOfImages, arrayOfAngles, arrayOfLabels
+
+	def GetTestingSet(self):
+		NUMBER_OF_TESTING_DATA = len(self.listOfRadarImages)
+		arrayOfImages = np.zeros( (NUMBER_OF_TESTING_DATA, DATA_WIDTH, DATA_HEIGHT, 2) )
+		arrayOfAngles = np.zeros( (NUMBER_OF_TESTING_DATA, 1) )
+		arrayOfLabels = np.zeros( (NUMBER_OF_TESTING_DATA, 2) )
+		listOfIDs = []
+
+		for i in range(NUMBER_OF_TESTING_DATA):
+			currentRadarImage = self.listOfRadarImages[i]
+			arrayOfImages[i, :, :, :] = currentRadarImage.GetTotalImage(False)
+			arrayOfAngles[i, :] = currentRadarImage.angle
+			listOfIDs.append(currentRadarImage.name)
+
+		return listOfIDs, arrayOfImages, arrayOfAngles
+
 
