@@ -11,4 +11,18 @@ This package provide some basic utilities (such as data loading, data drawing, a
 
 2. The Train.py will train the IceNet in src/IceNet.py.  For the Statoil Iceberg Competition, the input and the loss layer is fixed.  Therefore, we only need to change the net body (called the Subnet here) and make sure it return a tensor with the shape (batchSize, numberOfCategories).
 
-3. The src/IceNet.py will call SubnetFactory in settings/SubnetSettings.py.  If you want to add your own net, you simply just need
+3. The src/IceNet.py will call SubnetFactory in settings/SubnetSettings.py.  If you want to change the subnet, you simply just return which subnet you want.
+
+## Setup
+1. As illustrate above, the files in settings/ will not upload to avoid conflict in version.  You need to write your customized settings in settings/*.py.  You can refer to settings/*.example to see how to write settings. Namely, at the first time you download this package, you can simply do:
+	```Shell
+	$ cp settings/OutputSettings.example  settings/OutputSettings.py
+	$ cp settings/SubnetSettings.example  settings/SubnetSettings.py
+	$ cp settings/TrainingSettings.example  settings/TrainingSettings.py
+	```
+
+## Note
+If you're using python3, execute the program like:
+	```Shell
+	$ PYTHONPATH=.  python3  Train.py
+	```
