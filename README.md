@@ -6,22 +6,22 @@ This package provide some basic utilities (such as data loading, data drawing, a
 2. opencv
 
 ## Architecture
-   To avoid the conflict between users, this package use the following architecture:
-1. The Train.py has fixed procedures and some customized settings can be editted in settings/TrainingSettings.py in which will be ignored by Git so that the user will not get conflict if they both editted certain variables.
+   To avoid the conflicts between users, this package has the following architecture:
+1. The Train.py has fixed procedures and some customized settings can be adjusted in settings/TrainingSettings.py in which will be ignored by Git so that the user will not get conflict if they both edit certain variables.
 
-2. The Train.py will train the IceNet in src/IceNet.py.  For the Statoil Iceberg Competition, the input and the loss layer is fixed.  Therefore, we only need to change the net body (called the Subnet here) and make sure it return a tensor with the shape (batchSize, numberOfCategories).
+2. The Train.py will train the IceNet in src/IceNet.py.  For the Statoil Iceberg Competition, the input and the loss layer is fixed.  Therefore, the architecture of IceNet can be fixed.  We only need to customize its net body (called the Subnet here) in which you can define network such as AlexNet or ResNet like architecture.  And make sure it return a tensor as the shape (batchSize, numberOfCategories).
 
 3. The src/IceNet.py will call SubnetFactory in settings/SubnetSettings.py.  If you want to change the subnet, you simply just return which subnet you want.
 
 
 ## Setup
-1. At the first time, you should copy settings/*.example to settings*.py as follows:
+1. At the first time, you should copy settings/\*.example to settings/\*.py as follows:
 	```Shell
 	$ cp settings/OutputSettings.example  settings/OutputSettings.py
 	$ cp settings/SubnetSettings.example  settings/SubnetSettings.py
 	$ cp settings/TrainingSettings.example  settings/TrainingSettings.py
 	```
-  As illustrate above, the files in settings/ will not upload to avoid conflict in version.  You need to write your customized settings in settings/*.py.  You can refer to settings/*.example to see how to write settings.
+  As illustrate above, the files in settings/ will not upload to avoid conflict in version.  You need to write your customized settings in settings/\*.py.  You can refer to settings/\*.example to see how to write settings.
 
 
 ## How to Customize Subnet
@@ -37,6 +37,11 @@ This package provide some basic utilities (such as data loading, data drawing, a
     Note: isTraining_, inputImage_, inputAngle_, groundTruth_ is the placeholder.
 
 3. Edit SubnetFactory in settings/SubnetSettings.py to return your customized subnet so that Train.py will use your customized subnet to train the new model.
+
+
+## Utilities
+1. Train.py: Train the network.  The model will be saved in temp/
+2. DrawRadarImage.py:  The original data is in json format.  This tool can unpack the json file and draw the data as RGB images.
 
 
 ## Note
