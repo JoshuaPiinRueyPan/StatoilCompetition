@@ -6,10 +6,10 @@ This package provide some basic utilities (such as data loading, data drawing, a
 2. opencv
 
 ## Architecture
-   To avoid the conflict between users, this package use the following architecture:
-1. The Train.py has fixed procedures and some customized settings can be editted in settings/TrainingSettings.py in which will be ignored by Git so that the user will not get conflict if they both editted certain variables.
+   To avoid the conflicts between users, this package has the following architecture:
+1. The Train.py has fixed procedures and some customized settings can be adjusted in settings/TrainingSettings.py in which will be ignored by Git so that the user will not get conflict if they both edit certain variables.
 
-2. The Train.py will train the IceNet in src/IceNet.py.  For the Statoil Iceberg Competition, the input and the loss layer is fixed.  Therefore, we only need to change the net body (called the Subnet here) and make sure it return a tensor with the shape (batchSize, numberOfCategories).
+2. The Train.py will train the IceNet in src/IceNet.py.  For the Statoil Iceberg Competition, the input and the loss layer is fixed.  Therefore, the architecture of IceNet can be fixed.  We only need to customize its net body (called the Subnet here) in which you can define network such as AlexNet or ResNet like architecture.  And make sure it return a tensor as the shape (batchSize, numberOfCategories).
 
 3. The src/IceNet.py will call SubnetFactory in settings/SubnetSettings.py.  If you want to change the subnet, you simply just return which subnet you want.
 
