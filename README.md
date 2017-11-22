@@ -39,6 +39,11 @@ This package provide some basic utilities (such as data loading, data drawing, a
 3. Edit SubnetFactory in settings/SubnetSettings.py to return your customized subnet so that Train.py will use your customized subnet to train the new model.
 
 
+## Utilities
+1. Train.py: Train the network.  The model will be saved in temp/
+2. DrawRadarImage.py:  The original data is in json format.  This tool can unpack the json file and draw the data as RGB images.
+
+
 ## Note
 If you're using python3, execute the program like:
 	```Shell
