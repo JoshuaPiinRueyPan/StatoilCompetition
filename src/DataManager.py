@@ -24,7 +24,7 @@ class DataManager:
 		while outputIndex < BATCH_SIZE_:
 			currentRadarImage = self.listOfTrainingData[self.cursor]
 			arrayOfImages[outputIndex, :, :, :] = currentRadarImage.GetTotalImage(False)
-			arrayOfLabels[outputIndex, :] = currentRadarImage.angle
+			arrayOfAngles[outputIndex, :] = currentRadarImage.angle
 			if currentRadarImage.hasAnswer:
 				if currentRadarImage.isIceberg:
 					arrayOfLabels[outputIndex, :] = np.array([0., 1.])
@@ -50,7 +50,7 @@ class DataManager:
 		for i in range(NUMBER_OF_VALIDATION_DATA):
 			currentRadarImage = self.listOfTrainingData[i]
 			arrayOfImages[i, :, :, :] = currentRadarImage.GetTotalImage(False)
-			arrayOfLabels[i, :] = currentRadarImage.angle
+			arrayOfAngles[i, :] = currentRadarImage.angle
 			if currentRadarImage.hasAnswer:
 				if currentRadarImage.isIceberg:
 					arrayOfLabels[i, :] = np.array([0., 1.])
