@@ -13,6 +13,7 @@ This package provide some basic utilities (such as data loading, data drawing, a
 
 3. The src/IceNet.py will call SubnetFactory in settings/SubnetSettings.py.  If you want to change the subnet, you simply just return which subnet you want.
 
+
 ## Setup
 1. At the first time, you should copy settings/*.example to settings*.py as follows:
 	```Shell
@@ -26,17 +27,16 @@ This package provide some basic utilities (such as data loading, data drawing, a
 ## How to Customize Subnet
   You can refer to src/subnet/AlexnetTiny.py as an example.  The procedure is listed below:
 1. Create your own subnet in src/subnet/mySubnet.py
-2. 
-class AlexnetTiny(SubnetBase):
-	def __init__(self, isTraining_, inputImage_, inputAngle_, groundTruth_):
-		self.isTraining = isTraining_
-		self.inputImage = inputImage_
-		self.inputAngle = inputAngle_
-		self.groundTruth = groundTruth_
 
-	def Build(self):
-		weights, biases = self.buildNetVariables()
-		return self.buildNetBody(weights, biases)
+2. Your customized subnet should have the following structre:
+	```
+	class MySubNet(SubnetBase):
+		def __init__(self, isTraining_, inputImage_, inputAngle_, groundTruth_):
+		def Build(self):
+	```
+    Note: isTraining_, inputImage_, inputAngle_, groundTruth_ is the placeholder.
+
+3. Edit SubnetFactory in settings/SubnetSettings.py to return your customized subnet so that Train.py will use your customized subnet to train the new model.
 
 
 ## Note
