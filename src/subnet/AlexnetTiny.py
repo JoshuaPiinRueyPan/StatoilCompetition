@@ -1,5 +1,5 @@
 import tensorflow as tf
-from src.SubnetBase import SubnetBase
+from src.subnet.SubnetBase import SubnetBase
 from src.LayerHelper import *
 import settings.OutputSettings as outSettings
 
