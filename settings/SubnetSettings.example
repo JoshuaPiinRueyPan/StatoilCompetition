@@ -1,0 +1,4 @@
+from src.subnet.AlexnetTiny import *
+
+def SubnetFactory(isTraining_, inputImage_, inputAngle_, groundTruth_):
+	return AlexnetTiny(isTraining_, inputImage_, inputAngle_, groundTruth_)

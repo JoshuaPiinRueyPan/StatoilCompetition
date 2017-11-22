@@ -1,7 +1,7 @@
 import tensorflow as tf
-import RadarImage
-from subnet.AlexnetTiny import *
-import Settings as settings
+import src.RadarImage as RadarImage
+import settings.OutputSettings as outSettings
+from settings.SubnetSettings import SubnetFactory
 
 class IceNet:
 	def __init__(self):
@@ -9,9 +9,9 @@ class IceNet:
 		self.inputImage = tf.placeholder(tf.float32, 
 						 [None, RadarImage.DATA_WIDTH, RadarImage.DATA_HEIGHT, RadarImage.DATA_CHANNELS])
 		self.inputAngle = tf.placeholder(tf.float32, [None, 1])
-		self.groundTruth = tf.placeholder(tf.float32, [None, settings.NUMBER_OF_CATEGORIES])
+		self.groundTruth = tf.placeholder(tf.float32, [None, outSettings.NUMBER_OF_CATEGORIES])
 
-		self.subnet = AlexnetTiny(self.isTraining, self.inputImage, self.inputAngle, self.groundTruth)
+		self.subnet = SubnetFactory(self.isTraining, self.inputImage, self.inputAngle, self.groundTruth)
 
 	def Build(self):
 

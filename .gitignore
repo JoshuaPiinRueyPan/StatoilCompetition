@@ -1,6 +1,13 @@
 # ignore binary
 *.pyc
 
+# ignore editor temp file
+*.swp
+
+# ignore settings
+settings/*.py
+
 # ignore data
 *.jpg
 data/
+temp/

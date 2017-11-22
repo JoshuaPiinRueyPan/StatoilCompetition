@@ -1,7 +1,7 @@
 import tensorflow as tf
 from SubnetBase import SubnetBase
 from src.LayerHelper import *
-import src.Settings as settings
+import settings.OutputSettings as outSettings
 
 class AlexnetTiny(SubnetBase):
 	def __init__(self, isTraining_, inputImage_, inputAngle_, groundTruth_):
@@ -22,7 +22,7 @@ class AlexnetTiny(SubnetBase):
 			'convW4': tf.Variable(tf.random_normal([3, 3, 16, 16], stddev=0.01)),
 			'fcW1'  : tf.Variable(tf.random_normal([5*5*16+1, 128], stddev=0.01)),
 			'fcW2'  : tf.Variable(tf.random_normal([128, 128], stddev=0.01)),
-			'output': tf.Variable(tf.random_normal([128, settings.NUMBER_OF_CATEGORIES], stddev=0.01)),
+			'output': tf.Variable(tf.random_normal([128, outSettings.NUMBER_OF_CATEGORIES], stddev=0.01)),
 		}
 
 		biases = {
@@ -32,15 +32,12 @@ class AlexnetTiny(SubnetBase):
 			'convb4': tf.Variable(tf.random_normal([16], stddev=0.01)),
 			'fcb1'  : tf.Variable(tf.random_normal([128], stddev=0.01)),
 			'fcb2'  : tf.Variable(tf.random_normal([128], stddev=0.01)),
-			'output'  : tf.Variable(tf.random_normal([settings.NUMBER_OF_CATEGORIES], stddev=0.01)),
+			'output'  : tf.Variable(tf.random_normal([outSettings.NUMBER_OF_CATEGORIES], stddev=0.01)),
 		}
 		return weights, biases
 
 	def buildNetBody(self, weights, biases):
-		dropout = tf.cond(self.isTraining, lambda: 0.5, lambda: 1.)
-		inputx = tf.reshape(self.inputImage, shape=[-1, 75, 75, 2])
-
-		conv1 = convlayer('conv1', inputx, weights['convW1'], biases['convb1'])
+		conv1 = convlayer('conv1', self.inputImage, weights['convW1'], biases['convb1'])
 		pool1 = maxpool('pool1', conv1, k=2)
 		norm1 = norm('norm1', pool1, lsize=4)
 
@@ -61,6 +58,8 @@ class AlexnetTiny(SubnetBase):
 
 		fc1 = tf.add(tf.matmul(concat, weights['fcW1']), biases['fcb1'])
 		fc1 = tf.nn.relu(fc1)
+
+		dropout = tf.cond(self.isTraining, lambda: 0.5, lambda: 1.)
 		fc1 = tf.nn.dropout(fc1, dropout)
 
 		fc2 = tf.reshape(fc1, [-1, weights['fcW2'].get_shape().as_list()[0]])
