@@ -15,7 +15,7 @@ This package provide some basic utilities (such as data loading, data drawing, a
 
 
 ## Setup
-1. At the first time, you should copy settings/*.example to settings*.py as follows:
+1. At the first time, you should copy settings/\*.example to settings/\*.py as follows:
 	```Shell
 	$ cp settings/OutputSettings.example  settings/OutputSettings.py
 	$ cp settings/SubnetSettings.example  settings/SubnetSettings.py
