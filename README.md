@@ -1,5 +1,5 @@
-# Statoil Iceberg Recognition
-This package provide some basic utilities (such as data loading, data drawing, accuracy calculation... etc) that facilitate the design of network for Statoil Iceberg Recognition.
+# Statoil Iceberg Recognition Development Platform
+This package provide some basic utilities (such as data loading, data drawing, accuracy calculation... etc) that facilitate the design of network for Statoil Iceberg Competition.
 
 ## Requirements
 1. Tensorflow
@@ -20,6 +20,7 @@ This package provide some basic utilities (such as data loading, data drawing, a
 	$ cp settings/OutputSettings.example  settings/OutputSettings.py
 	$ cp settings/SubnetSettings.example  settings/SubnetSettings.py
 	$ cp settings/TrainingSettings.example  settings/TrainingSettings.py
+	$ cp settings/TestSettings.example  settings/TestSettings.py
 	```
   As illustrate above, the files in settings/ will not upload to avoid conflict in version.  You need to write your customized settings in settings/\*.py.  You can refer to settings/\*.example to see how to write settings.
 

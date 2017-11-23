@@ -2,7 +2,7 @@
 import os
 import tensorflow as tf
 import numpy as np
-from src.DataManager import *
+from src.DataManager import TrainingDataManager
 from src.IceNet import *
 import settings.TrainingSettings as trainSettings
 
@@ -11,7 +11,7 @@ class Solver:
 		self.net = IceNet()
 		self.cost, self.accuracy = self.net.Build()
 		self.optimizer = tf.train.AdamOptimizer(learning_rate=trainSettings.learningRate).minimize(self.cost)
-		self.dataManager = DataManager(trainSettings.TRAINING_SET_PATH_NAME, trainSettings.VALIDATION_RATIO)
+		self.dataManager = TrainingDataManager(trainSettings.TRAINING_SET_PATH_NAME, trainSettings.VALIDATION_RATIO)
 		self.saver = tf.train.Saver()
 		self.validation_x, self.validation_x_angle, self.validation_y = self.dataManager.GetValidationSet()
 

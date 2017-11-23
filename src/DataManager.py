@@ -1,7 +1,7 @@
 from random import shuffle
 from src.RadarImage import *
 
-class DataManager:
+class TrainingDataManager:
 	def __init__(self, DATA_SET_FILE_PATH_, VALIDATION_RATIO_):
 		self.isNewEpoch = True
 		self.epoch = 0
@@ -59,6 +59,12 @@ class DataManager:
 					arrayOfLabels[i, :] = np.array([1., 0.])
 
 		return arrayOfImages, arrayOfAngles, arrayOfLabels
+
+
+class TestingDataManager:
+	def __init__(self, DATA_SET_FILE_PATH_):
+		dataReader = StatoilDataReader()
+		self.listOfRadarImages = dataReader.Read(DATA_SET_FILE_PATH_)
 
 	def GetTestingSet(self):
 		NUMBER_OF_TESTING_DATA = len(self.listOfRadarImages)
