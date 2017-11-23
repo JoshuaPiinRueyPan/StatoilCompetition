@@ -31,8 +31,6 @@ class Testing:
 								    self.net.inputImage : [self.arrayOfImages[i]],
 								    self.net.inputAngle : [self.arrayOfAngles[i]]})
 				answer = testSettings.GetAnswer(netOutput)
-				print("netOut = " + str(netOutput[0][1]))
-				print("answer = " + str(answer))
 				answerList = [self.listOfIDs[i], answer]
 				csvWriter.writerow(answerList)
 
