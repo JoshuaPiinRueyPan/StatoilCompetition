@@ -4,7 +4,11 @@ SUMMARY_FILE_PATH_NAME = "temp/answerlog.csv"
 
 def GetAnswer(icenetOutput_):
 	icebergProbability = icenetOutput_[0][1]
-	if icebergProbability < 0.3:
+	return icebergProbability
+
+
+def scaleAnswerWithStepFunction(icebergProbability):
+	if icebergProbability < 0.1:
 		return 0.0
 
 	elif icebergProbability >= 0.7:
