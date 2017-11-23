@@ -3,6 +3,7 @@
 
 # ignore editor temp file
 *.swp
+*.py\~
 
 # ignore settings
 settings/*.py
