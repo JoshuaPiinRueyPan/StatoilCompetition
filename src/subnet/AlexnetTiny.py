@@ -37,21 +37,21 @@ class AlexnetTiny(SubnetBase):
 		return weights, biases
 
 	def buildNetBody(self, weights, biases):
-		conv1 = convlayer('conv1', self.inputImage, weights['convW1'], biases['convb1'])
-		pool1 = maxpool('pool1', conv1, k=2)
-		norm1 = norm('norm1', pool1, lsize=4)
+		conv1 = ConvLayer('conv1', self.inputImage, weights['convW1'], biases['convb1'])
+		pool1 = MaxPoolLayer('pool1', conv1, k=2)
+		norm1 = AlexNorm('norm1', pool1, lsize=4)
 
-		conv2 = convlayer('conv2', norm1, weights['convW2'], biases['convb2'])
-		pool2 = maxpool('pool2', conv2, k=2)
-		norm2 = norm('norm3', pool2, lsize=4)
+		conv2 = ConvLayer('conv2', norm1, weights['convW2'], biases['convb2'])
+		pool2 = MaxPoolLayer('pool2', conv2, k=2)
+		norm2 = AlexNorm('norm3', pool2, lsize=4)
 
-		conv3 = convlayer('conv3', norm2, weights['convW3'], biases['convb3'])
-		pool3 = maxpool('pool3', conv3, k=2)
-		norm3 = norm('norm3', pool3, lsize=4)
+		conv3 = ConvLayer('conv3', norm2, weights['convW3'], biases['convb3'])
+		pool3 = MaxPoolLayer('pool3', conv3, k=2)
+		norm3 = AlexNorm('norm3', pool3, lsize=4)
 
-		conv4 = convlayer('conv4', norm3, weights['convW4'], biases['convb4'], padding='VALID')
-		pool4 = maxpool('pool4', conv4, k=2)
-		norm4 = norm('norm4', pool4, lsize=4)
+		conv4 = ConvLayer('conv4', norm3, weights['convW4'], biases['convb4'], padding='VALID')
+		pool4 = MaxPoolLayer('pool4', conv4, k=2)
+		norm4 = AlexNorm('norm4', pool4, lsize=4)
 
 		pool4reshape = tf.reshape(norm4, [-1, weights['fcW1'].get_shape().as_list()[0]-1])
 		concat = tf.concat(axis=1, values=[pool4reshape, self.inputAngle])
