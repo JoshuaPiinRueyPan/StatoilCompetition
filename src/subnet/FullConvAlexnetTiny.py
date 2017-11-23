@@ -3,7 +3,7 @@ from src.subnet.SubnetBase import SubnetBase
 from src.LayerHelper import *
 import settings.OutputSettings as outSettings
 
-class AlexnetTiny(SubnetBase):
+class FullConvAlexnetTiny(SubnetBase):
 	def __init__(self, isTraining_, inputImage_, inputAngle_, groundTruth_):
 		self.isTraining = isTraining_
 		self.inputImage = inputImage_
@@ -20,9 +20,7 @@ class AlexnetTiny(SubnetBase):
 			'convW2': tf.Variable(tf.random_normal([3, 3, 8, 16], stddev=0.01)),
 			'convW3': tf.Variable(tf.random_normal([3, 3, 16, 16], stddev=0.01)),
 			'convW4': tf.Variable(tf.random_normal([3, 3, 16, 16], stddev=0.01)),
-			'fcW1'  : tf.Variable(tf.random_normal([5*5*16+1, 128], stddev=0.01)),
-			'fcW2'  : tf.Variable(tf.random_normal([128, 128], stddev=0.01)),
-			'output': tf.Variable(tf.random_normal([128, outSettings.NUMBER_OF_CATEGORIES], stddev=0.01)),
+			'convW1x1' : tf.Variable(tf.random_normal([1, 1, 16, 2], stddev=0.01)),
 		}
 
 		biases = {
@@ -30,9 +28,7 @@ class AlexnetTiny(SubnetBase):
 			'convb2': tf.Variable(tf.random_normal([16], stddev=0.01)),
 			'convb3': tf.Variable(tf.random_normal([16], stddev=0.01)),
 			'convb4': tf.Variable(tf.random_normal([16], stddev=0.01)),
-			'fcb1'  : tf.Variable(tf.random_normal([128], stddev=0.01)),
-			'fcb2'  : tf.Variable(tf.random_normal([128], stddev=0.01)),
-			'output'  : tf.Variable(tf.random_normal([outSettings.NUMBER_OF_CATEGORIES], stddev=0.01)),
+			'convb1x1' : tf.Variable(tf.random_normal([2], stddev=0.01)),
 		}
 		return weights, biases
 
@@ -53,20 +49,9 @@ class AlexnetTiny(SubnetBase):
 		pool4 = maxpool('pool4', conv4, k=2)
 		norm4 = norm('norm4', pool4, lsize=4)
 
-		pool4reshape = tf.reshape(norm4, [-1, weights['fcW1'].get_shape().as_list()[0]-1])
-		concat = tf.concat(axis=1, values=[pool4reshape, self.inputAngle])
-
-		fc1 = tf.add(tf.matmul(concat, weights['fcW1']), biases['fcb1'])
-		fc1 = tf.nn.relu(fc1)
-
-		dropout = tf.cond(self.isTraining, lambda: 0.5, lambda: 1.)
-		fc1 = tf.nn.dropout(fc1, dropout)
-
-		fc2 = tf.reshape(fc1, [-1, weights['fcW2'].get_shape().as_list()[0]])
-		fc2 = tf.add(tf.matmul(fc2, weights['fcW2']), biases['fcb2'])
-		fc2 = tf.nn.relu(fc2)
-		fc2 = tf.nn.dropout(fc2, dropout)
-
-		output = tf.add(tf.matmul(fc2, weights['output']), biases['output'])
+		conv1x1 = convlayer('conv1x1', norm4, weights['convW1x1'], biases['convb1x1'], padding='VALID')
+		maxPoolFinal = maxpool('poolFinal', conv1x1, k=5)
+		output = tf.reshape(maxPoolFinal, shape=[-1, 2])
+		
 		return output
 

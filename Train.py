@@ -5,7 +5,6 @@ import numpy as np
 from src.DataManager import TrainingDataManager
 from src.IceNet import *
 import settings.TrainingSettings as trainSettings
-from src.OptimizerFactory import *
 
 class Solver:
 	def __init__(self):
@@ -31,7 +30,6 @@ class Solver:
 
 			while self.dataManager.epoch < trainSettings.MAX_TRAINING_EPOCH:
 				batch_x, batch_x_angle, batch_y = self.dataManager.GetTrainingBatch(trainSettings.BATCH_SIZE)
-				print("angle = " + str(batch_x_angle))
 				self.trainIcenet(sess, batch_x, batch_x_angle, batch_y)
 
 				if self.dataManager.isNewEpoch:

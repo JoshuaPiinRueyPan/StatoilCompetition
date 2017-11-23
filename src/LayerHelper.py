@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 def convlayer(name, x, W, b, strides=1, padding='SAME'):
-	x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding='SAME')
+	x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding=padding)
 	x = tf.nn.bias_add(x, b)
 	return tf.nn.relu(x, name = name)
 
