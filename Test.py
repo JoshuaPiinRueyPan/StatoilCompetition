@@ -11,7 +11,9 @@ class Testing:
 	def __init__(self):
 		self.net = IceNet()
 		self.cost, self.accuracy = self.net.Build()
+		print("Loading Test Set, please wait...")
 		self.dataManager = TestingDataManager(testSettings.TESTING_SET_PATH_NAME)
+		print("Loading finished.")
 		self.saver = tf.train.Saver()
 		self.listOfIDs, self.arrayOfImages, self.arrayOfAngles = self.dataManager.GetTestingSet()
 
@@ -29,6 +31,8 @@ class Testing:
 								    self.net.inputImage : [self.arrayOfImages[i]],
 								    self.net.inputAngle : [self.arrayOfAngles[i]]})
 				answer = testSettings.GetAnswer(netOutput)
+				print("netOut = " + str(netOutput[0][1]))
+				print("answer = " + str(answer))
 				answerList = [self.listOfIDs[i], answer]
 				csvWriter.writerow(answerList)
 
