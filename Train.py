@@ -41,9 +41,9 @@ class Solver:
 
 					if self.dataManager.epoch >= trainSettings.EPOCHS_TO_START_SAVE_WEIGHTINGS:
 						pathToSaveCheckpoint = os.path.join("temp", 
-										     "save_epoch" + str(self.dataManager.epoch),
+										     "save_epoch",
 										     "iceberg.ckpt")
-						self.saver.save(sess,  pathToSaveCheckpoint)
+						self.saver.save(sess,  pathToSaveCheckpoint, global_step=self.dataManager.epoch)
 			print("Optimization finished!")
 
 	def trainIcenet(self, session, batch_x, batch_x_angle, batch_y):
