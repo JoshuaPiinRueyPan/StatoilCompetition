@@ -1,11 +1,11 @@
 import tensorflow as tf
 
-def ConvLayer(x, W, b, strides=1, name=None, padding='SAME'):
+def ConvLayer(x, W, b, strides=1, padding='SAME', name=None):
 	x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding=padding)
 	x = tf.nn.bias_add(x, b)
 	return tf.nn.relu(x, name = name)
 
-def AlexNorm(inputTensor, name=None, lsize=4):
+def AlexNorm(inputTensor, lsize=4, name=None):
 	return tf.nn.lrn(inputTensor, lsize, bias=1.0, alpha=0.001/9.0, beta=0.75, name=name)
 
 def MaxPoolLayer(x, kernelSize=2, name=None):
