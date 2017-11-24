@@ -50,7 +50,7 @@ class DataDrawer:
 		if radarImage_.hasAngle:
 			angleInfo = "{0:.2f}".format(radarImage_.angle)
 		imageInfo = prefix_  + ";  "  + categoryInfo + ";  angle: " + angleInfo
-		cv2.putText(image_, imageInfo, (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2, cv2.CV_AA)
+		cv2.putText(image_, imageInfo, (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
 
 	def saveEachRadarImage(self, TARGET_DIRECTORY_, radarImage_, imageHH_, imageHV_, imageTotal_):
 		pathToSaveImageHH = radarImage_.name + "_HH.jpg"
