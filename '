@@ -112,7 +112,5 @@ class DarkNet19(SubnetBase):
 		net = MaxPoolLayer('poolFinal', net, kernelSize=5)
 		output = tf.reshape(net, shape=[-1, 2])
 
-		#output = tf.reshape(maxPoolFinal, shape=[-1, 2])
-		
 		return output
 

@@ -1,19 +1,19 @@
 import tensorflow as tf
 
-def ConvLayer(name, x, W, b, strides=1, padding='SAME'):
+def ConvLayer(x, W, b, strides=1, name=None, padding='SAME'):
 	x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding=padding)
 	x = tf.nn.bias_add(x, b)
 	return tf.nn.relu(x, name = name)
 
-def AlexNorm(name, l_input, lsize=4):
-	return tf.nn.lrn(l_input, lsize, bias=1.0, alpha=0.001/9.0, beta=0.75, name=name)
+def AlexNorm(inputTensor, name=None, lsize=4):
+	return tf.nn.lrn(inputTensor, lsize, bias=1.0, alpha=0.001/9.0, beta=0.75, name=name)
 
-def MaxPoolLayer(name, x, kernelSize=2):
+def MaxPoolLayer(x, kernelSize=2, name=None):
 	return tf.nn.max_pool(x, ksize=[1, kernelSize, kernelSize, 1],
 				 strides=[1, kernelSize, kernelSize, 1], padding='SAME', name=name)
 
 
-def AvgPoolLayer(name, x, kernelSize):
+def AvgPoolLayer(x, kernelSize, name=None):
 	return tf.nn.avg_pool(x, ksize=[1, kernelSize, kernelSize, 1],
 				 strides=[1, kernelSize, kernelSize, 1],
 				 padding='VALID',

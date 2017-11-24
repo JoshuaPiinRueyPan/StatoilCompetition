@@ -4,6 +4,14 @@ from src.LayerHelper import *
 import settings.OutputSettings as outSettings
 
 class FullConvAlexnetTiny(SubnetBase):
+	'''
+	    Summary:
+		This net fail to give good results.  The final accuracy is ONLY 0.5.
+		Looks like Fc after Conv Net is important.  Otherwise the net will
+		have too few parameters to learn the task
+
+	    Note: In the last layer, both the AvgPool and MaxPool are worse here.
+	'''
 	def __init__(self, isTraining_, inputImage_, inputAngle_, groundTruth_):
 		self.isTraining = isTraining_
 		self.inputImage = inputImage_
