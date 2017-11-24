@@ -41,24 +41,24 @@ class FullConvAlexnetTiny(SubnetBase):
 		return weights, biases
 
 	def buildNetBody(self, weights, biases):
-		conv1 = ConvLayer('conv1', self.inputImage, weights['convW1'], biases['convb1'])
-		pool1 = MaxPoolLayer('pool1', conv1, kernelSize=2)
-		norm1 = AlexNorm('norm1', pool1, lsize=4)
+		conv1 = ConvLayer(self.inputImage, weights['convW1'], biases['convb1'], name='conv1')
+		pool1 = MaxPoolLayer(conv1, kernelSize=2, name='pool1')
+		norm1 = AlexNorm(pool1, lsize=4, name='norm1')
 
-		conv2 = ConvLayer('conv2', norm1, weights['convW2'], biases['convb2'])
-		pool2 = MaxPoolLayer('pool2', conv2, kernelSize=2)
-		norm2 = AlexNorm('norm3', pool2, lsize=4)
+		conv2 = ConvLayer(norm1, weights['convW2'], biases['convb2'], name='conv2')
+		pool2 = MaxPoolLayer(conv2, kernelSize=2, name='pool2')
+		norm2 = AlexNorm(pool2, lsize=4, name='norm3')
 
-		conv3 = ConvLayer('conv3', norm2, weights['convW3'], biases['convb3'])
-		pool3 = MaxPoolLayer('pool3', conv3, kernelSize=2)
-		norm3 = AlexNorm('norm3', pool3, lsize=4)
+		conv3 = ConvLayer(norm2, weights['convW3'], biases['convb3'], name='conv3')
+		pool3 = MaxPoolLayer(conv3, kernelSize=2, name='pool3')
+		norm3 = AlexNorm(pool3, lsize=4, name='norm3')
 
-		conv4 = ConvLayer('conv4', norm3, weights['convW4'], biases['convb4'])
-		pool4 = MaxPoolLayer('pool4', conv4, kernelSize=2)
-		norm4 = AlexNorm('norm4', pool4, lsize=4)
+		conv4 = ConvLayer(norm3, weights['convW4'], biases['convb4'], name='conv4')
+		pool4 = MaxPoolLayer(conv4, kernelSize=2, name='pool4')
+		norm4 = AlexNorm(pool4, lsize=4, name='norm4')
 
-		conv1x1 = ConvLayer('conv1x1', norm4, weights['convW1x1'], biases['convb1x1'], padding='VALID')
-		avgPoolFinal = AvgPoolLayer('poolFinal', conv1x1, kernelSize=5)
+		conv1x1 = ConvLayer(norm4, weights['convW1x1'], biases['convb1x1'], padding='VALID', name='conv1x1')
+		avgPoolFinal = AvgPoolLayer(conv1x1, kernelSize=5, name='poolFinal')
 		output = tf.reshape(avgPoolFinal, shape=[-1, 2])
 
 		#maxPoolFinal = MaxPoolLayer('poolFinal', conv1x1, kernelSize=5)
