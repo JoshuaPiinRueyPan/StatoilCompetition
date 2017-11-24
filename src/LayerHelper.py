@@ -3,6 +3,11 @@ import tensorflow as tf
 def ConvLayer(x, W, b, strides=1, padding='SAME', name=None):
 	x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding=padding)
 	x = tf.nn.bias_add(x, b)
+
+	layerName = name
+	if layerName is None:
+		layerName = 'layer: s='+str(strides)
+	tf.summary.histogram(layerName + '/weights', W)
 	return tf.nn.relu(x, name = name)
 
 def AlexNorm(inputTensor, lsize=4, name=None):

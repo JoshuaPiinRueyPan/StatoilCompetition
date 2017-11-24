@@ -16,13 +16,14 @@ class IceNet:
 		self.subnet = SubnetFactory(self.isTraining, self.inputImage, self.inputAngle, self.groundTruth)
 
 	def Build(self):
-
 		netOutput = self.subnet.Build()
 		self.softmax = tf.nn.softmax(netOutput)
-		cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=netOutput, labels=self.groundTruth))
+		loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=netOutput, labels=self.groundTruth))
 		accuracy = self.calculateAccuracy(netOutput, self.groundTruth)
+		tf.summary.scalar('loss', loss)
+		tf.summary.scalar('accuracy', accuracy)
 
-		return cost, accuracy
+		return loss, accuracy
 
 	def calculateAccuracy(self, netOutput_, groundTruth_):
 		correctPredictions = tf.equal(tf.argmax(netOutput_, 1), tf.argmax(groundTruth_, 1))

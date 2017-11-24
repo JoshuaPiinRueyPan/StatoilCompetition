@@ -3,18 +3,18 @@ VALIDATION_RATIO = 0.1
 
 BATCH_SIZE = 100
 
-EPOCHS_TO_START_SAVE_WEIGHTINGS = 200
+MAX_TRAINING_EPOCH = 200
 
-MAX_TRAINING_EPOCH = 500
-
-MAX_TRAINING_SAVEMODEL = 200
+EPOCHS_TO_START_SAVE_MODEL = 50
+PATH_TO_SAVE_MODEL = "temp/model"
+MAX_TRAINING_SAVE_MODEL = 200
 
 '''
     Following can be used to customize learning rate,
     you can either use tf.train.exponetial_decay().
 '''
 LIST_OF_EPOCH_LEARNING_RATE_PAIRS = [ (0, 1e-4) ]
-#LIST_OF_EPOCH_LEARNING_RATE_PAIRS = [ (0, 1e-4), (200, 1e-5), (300, 1e-6) ]
+#LIST_OF_EPOCH_LEARNING_RATE_PAIRS = [ (0, 1e-3), (30, 1e-4), (300, 1e-5) ]
 def GetLearningRate(currentEpoch_):
 	for eachPair in reversed(LIST_OF_EPOCH_LEARNING_RATE_PAIRS):
 		if currentEpoch_ >= eachPair[0]:
