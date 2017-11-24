@@ -53,9 +53,6 @@ class AlexnetTinyWithoutAngle(SubnetBase):
 		net = MaxPoolLayer(net, kernelSize=2, name='pool4')
 		net = AlexNorm(net, lsize=4, name='norm4')
 
-		print("******************")
-		print("ConvFinal.shape = " + str( net.shape ) )
-		print("******************")
 		net = tf.reshape(net, [-1, weights['fcW1'].get_shape().as_list()[0]])
 
 		net = tf.add(tf.matmul(net, weights['fcW1']), biases['fcb1'])
