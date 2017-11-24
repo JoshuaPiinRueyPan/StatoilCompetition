@@ -21,7 +21,7 @@ class Solver:
 		self.optimizer = tf.train.AdamOptimizer(learning_rate=self.learningRate).minimize(self.cost)
 
 		# Saver
-		self.saver = tf.train.Saver()
+		self.saver = tf.train.Saver(max_to_keep=trainSettings.MAX_TRAINING_SAVEMODEL)
 
 	def Run(self):
 		init = tf.initialize_all_variables()
@@ -39,7 +39,7 @@ class Solver:
 
 					if self.dataManager.epoch >= trainSettings.EPOCHS_TO_START_SAVE_WEIGHTINGS:
 						pathToSaveCheckpoint = os.path.join("temp", 
-										     "save_epoch",
+										     "save_epoch_" + str(self.dataManager.epoch),
 										     "iceberg.ckpt")
 						self.saver.save(sess,  pathToSaveCheckpoint, global_step=self.dataManager.epoch)
 			print("Optimization finished!")

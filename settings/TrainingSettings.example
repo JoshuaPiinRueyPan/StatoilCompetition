@@ -7,6 +7,8 @@ EPOCHS_TO_START_SAVE_WEIGHTINGS = 200
 
 MAX_TRAINING_EPOCH = 500
 
+MAX_TRAINING_SAVEMODEL = 200
+
 '''
     Following can be used to customize learning rate,
     you can either use tf.train.exponetial_decay().
