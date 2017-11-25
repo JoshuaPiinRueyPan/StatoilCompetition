@@ -31,6 +31,7 @@ class Solver:
 		with tf.Session() as sess:
 			sess.run(init)
 			self.validSumWriter.add_graph(sess.graph)
+			self.loadPretrainModelIfUserRequired(sess)
 
 			while self.dataManager.epoch < trainSettings.MAX_TRAINING_EPOCH:
 				batch_x, batch_x_angle, batch_y = self.dataManager.GetTrainingBatch(trainSettings.BATCH_SIZE)
@@ -45,8 +46,19 @@ class Solver:
 						pathToSaveCheckpoint = os.path.join(trainSettings.PATH_TO_SAVE_MODEL, 
 										     "save_epoch_" + str(self.dataManager.epoch),
 										     "iceberg.ckpt")
-						self.saver.save(sess,  pathToSaveCheckpoint, global_step=self.dataManager.epoch)
+						self.saver.save(sess,  pathToSaveCheckpoint)
+						#self.saver.save(sess,  pathToSaveCheckpoint, global_step=self.dataManager.epoch)
 			print("Optimization finished!")
+
+	def loadPretrainModelIfUserRequired(self, session):
+		if trainSettings.PRETRAIN_MODEL_PATH_NAME != "":
+			modelLoader = tf.train.Saver()
+			print("Load Pretrain model from: " + trainSettings.PRETRAIN_MODEL_PATH_NAME)
+			modelLoader.restore(session, trainSettings.PRETRAIN_MODEL_PATH_NAME)
+		else:
+			print("Initialize model parameters by random")
+			pass
+
 
 	def trainIcenet(self, session, batch_x, batch_x_angle, batch_y):
 		currentLearningRate = trainSettings.GetLearningRate(self.dataManager.epoch)
