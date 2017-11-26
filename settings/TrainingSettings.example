@@ -4,11 +4,11 @@ VALIDATION_RATIO = 0.1
 
 BATCH_SIZE = 100
 
-MAX_TRAINING_EPOCH = 200
+MAX_TRAINING_EPOCH = 250
 
-EPOCHS_TO_START_SAVE_MODEL = 50
-PATH_TO_SAVE_MODEL = "temp/model/test"
-MAX_TRAINING_SAVE_MODEL = 200
+EPOCHS_TO_START_SAVE_MODEL = 20
+PATH_TO_SAVE_MODEL = "temp/model/Alexnet"
+MAX_TRAINING_SAVE_MODEL = MAX_TRAINING_EPOCH
 
 '''
     Following can be used to customize learning rate,
@@ -23,3 +23,16 @@ def GetLearningRate(currentEpoch_):
 
 	# If nothing matched, return the first pair.learningRate as default
 	return trainSettings.LIST_OF_EPOCH_LEARNING_RATE_PAIRS[0][1] 
+
+
+######################
+#  Advanced Settings #
+######################
+'''
+      For Large Model such as VGG16, one can't stuff all validation set
+    into one batch.  In this case, you should trun the following variable
+    to False.  And the validation loss & accuracy will be calculated
+    one by one. (The training will be slower, but the loss & accuracy value
+    will be the same.)
+'''
+DOES_CALCULATE_VALIDATION_SET_AT_ONCE = True

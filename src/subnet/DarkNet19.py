@@ -1,6 +1,6 @@
 import tensorflow as tf
 from src.subnet.SubnetBase import SubnetBase
-from src.LayerHelper import *
+from src.layers.BasicLayers import *
 import settings.OutputSettings as outSettings
 
 class DarkNet19(SubnetBase):

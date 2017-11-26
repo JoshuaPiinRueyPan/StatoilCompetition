@@ -21,5 +21,5 @@ def MaxPoolLayer(x, kernelSize=2, name=None):
 def AvgPoolLayer(x, kernelSize, name=None):
 	return tf.nn.avg_pool(x, ksize=[1, kernelSize, kernelSize, 1],
 				 strides=[1, kernelSize, kernelSize, 1],
-				 padding='VALID',
+				 padding='SAME',
 				 name='avg_pool')
