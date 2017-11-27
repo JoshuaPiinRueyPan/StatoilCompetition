@@ -14,7 +14,13 @@ class VGG19(SubnetBase):
 		self.inputAngle = inputAngle_
 		self.groundTruth = groundTruth_
 
-		self.data_dict = np.load(VGG_MODEL_PATH, encoding='latin1').item()
+		try:
+			self.data_dict = np.load(VGG_MODEL_PATH, encoding='latin1').item()
+
+		except:
+			self.data_dict = None
+			print("No VGG16 pretrain model found!  If you want to use the pretrain model, please")
+			print("download vgg16.npy from: https://github.com/machrisaa/tensorflow-vgg")
 
 
 	def Build(self):
