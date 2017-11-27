@@ -1,0 +1,5 @@
+
+FLIP = True
+SHIFT = True
+ROTATE = True
+ZOOM = True
