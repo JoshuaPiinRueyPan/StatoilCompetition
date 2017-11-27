@@ -129,7 +129,7 @@ class Solver:
 		mergedSumOp = tf.summary.merge([lossSumOp, accuSumOp])
 
 		summary, meanLoss, meanAccu = session.run( [mergedSumOp, meanLossOp, meanAccuOp])
-		self.validaSumWriter.add_summary(summary)
+		self.validaSumWriter.add_summary(summary, self.dataManager.epoch)
 		print("    validation:")
 		print("        loss: " + str(meanLoss) + ", accuracy: " + str(meanAccu) + "\n")
 
