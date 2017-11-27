@@ -16,20 +16,20 @@ class AlexnetTinyWithoutAngle(SubnetBase):
 
 	def buildNetVariables(self):
 		weights = {
-			'convW1': tf.Variable(tf.random_normal([3, 3, 2, 17], stddev=0.01)),
-			'convW2': tf.Variable(tf.random_normal([3, 3, 17, 26], stddev=0.01)),
-			'convW3': tf.Variable(tf.random_normal([3, 3, 26, 13], stddev=0.01)),
-			'convW4': tf.Variable(tf.random_normal([3, 3, 13, 7], stddev=0.01)),
-			'fcW1'  : tf.Variable(tf.random_normal([18*18*7, 128], stddev=0.01)),
+			'convW1': tf.Variable(tf.random_normal([3, 3, 2, 64], stddev=0.01)),
+			'convW2': tf.Variable(tf.random_normal([3, 3, 64, 16], stddev=0.01)),
+			'convW3': tf.Variable(tf.random_normal([3, 3, 16, 32], stddev=0.01)),
+			'convW4': tf.Variable(tf.random_normal([3, 3, 32, 16], stddev=0.01)),
+			'fcW1'  : tf.Variable(tf.random_normal([18*18*16, 128], stddev=0.01)),
 			'fcW2'  : tf.Variable(tf.random_normal([128, 128], stddev=0.01)),
 			'output': tf.Variable(tf.random_normal([128, outSettings.NUMBER_OF_CATEGORIES], stddev=0.01)),
 		}
 
 		biases = {
-			'convb1': tf.Variable(tf.random_normal([17], stddev=0.01)),
-			'convb2': tf.Variable(tf.random_normal([26], stddev=0.01)),
-			'convb3': tf.Variable(tf.random_normal([13], stddev=0.01)),
-			'convb4': tf.Variable(tf.random_normal([7], stddev=0.01)),
+			'convb1': tf.Variable(tf.random_normal([64], stddev=0.01)),
+			'convb2': tf.Variable(tf.random_normal([16], stddev=0.01)),
+			'convb3': tf.Variable(tf.random_normal([32], stddev=0.01)),
+			'convb4': tf.Variable(tf.random_normal([16], stddev=0.01)),
 			'fcb1'  : tf.Variable(tf.random_normal([128], stddev=0.01)),
 			'fcb2'  : tf.Variable(tf.random_normal([128], stddev=0.01)),
 			'output'  : tf.Variable(tf.random_normal([outSettings.NUMBER_OF_CATEGORIES], stddev=0.01)),
