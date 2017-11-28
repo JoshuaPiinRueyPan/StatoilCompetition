@@ -16,6 +16,7 @@ class VGG19(SubnetBase):
 
 		try:
 			self.data_dict = np.load(VGG_MODEL_PATH, encoding='latin1').item()
+			print("Load VGG pretrain model...")
 
 		except:
 			self.data_dict = None

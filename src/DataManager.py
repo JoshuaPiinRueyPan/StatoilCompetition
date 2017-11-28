@@ -1,5 +1,6 @@
 from random import shuffle
 from src.RadarImage import *
+from src.DataAugmentation import *
 
 class TrainingDataManager:
 	def __init__(self, DATA_SET_FILE_PATH_, VALIDATION_RATIO_):
@@ -13,6 +14,7 @@ class TrainingDataManager:
 		NUMBER_OF_VALIDATION_DATA = int( VALIDATION_RATIO_*len(self.listOfRadarImages) )
 		self.listOfValidationData = self.listOfRadarImages[ : NUMBER_OF_VALIDATION_DATA]
 		self.listOfTrainingData = self.listOfRadarImages[NUMBER_OF_VALIDATION_DATA : ]
+		self.DataAugmentation = DataAugmentation()
 
 
 	def GetTrainingBatch(self, BATCH_SIZE_):
@@ -24,7 +26,8 @@ class TrainingDataManager:
 		outputIndex = 0
 		while outputIndex < BATCH_SIZE_:
 			currentRadarImage = self.listOfTrainingData[self.cursor]
-			arrayOfImages[outputIndex, :, :, :] = currentRadarImage.GetTotalImage(False)
+			porcessedImage = self.DataAugmentation.Augment(currentRadarImage.GetTotalImage(False))
+			arrayOfImages[outputIndex, :, :, :] = porcessedImage
 			arrayOfAngles[outputIndex, :] = currentRadarImage.angle
 			if currentRadarImage.hasAnswer:
 				if currentRadarImage.isIceberg:
@@ -80,5 +83,3 @@ class TestingDataManager:
 			listOfIDs.append(currentRadarImage.name)
 
 		return listOfIDs, arrayOfImages, arrayOfAngles
-
-
