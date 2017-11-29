@@ -16,7 +16,7 @@ class Solver:
 
 		# Net
 		self.net = IceNet()
-		self.lossOp, self.accuracyOp = self.net.Build()
+		self.lossOp, self.accuracyOp, self.updateOp = self.net.Build()
 
 		# Optimizer
 		self.learningRate = tf.placeholder(tf.float32, shape=[])
@@ -37,7 +37,8 @@ class Solver:
 
 			while self.dataManager.epoch < trainSettings.MAX_TRAINING_EPOCH:
 				batch_x, batch_x_angle, batch_y = self.dataManager.GetTrainingBatch(trainSettings.BATCH_SIZE)
-				self.trainIcenet(sess, batch_x, batch_x_angle, batch_y)
+				self.trainIceNet(sess, batch_x, batch_x_angle, batch_y)
+				self.updateIceNet(sess, batch_x, batch_x_angle, batch_y)
 
 				if self.dataManager.isNewEpoch:
 					print("Epoch: " + str(self.dataManager.epoch)+" ======================================")
@@ -64,19 +65,33 @@ class Solver:
 			pass
 
 
-	def trainIcenet(self, session, batch_x, batch_x_angle, batch_y):
+	def trainIceNet(self, session, batch_x, batch_x_angle, batch_y):
 		currentLearningRate = trainSettings.GetLearningRate(self.dataManager.epoch)
 		session.run( self.optimizer,
 			     feed_dict={self.net.isTraining : True,
+					self.net.trainingStep : self.dataManager.step,
 					self.net.inputImage : batch_x,
 					self.net.inputAngle : batch_x_angle,
 					self.net.groundTruth : batch_y,
 					self.learningRate : currentLearningRate})
 
+	def updateIceNet(self, session, batch_x, batch_x_angle, batch_y):
+		'''
+		    Some Network has variables that need to be updated after training (e.g. the net with
+		    batch normalization).  After training, following code update such variables.
+		'''
+		session.run( self.updateOp,
+			     feed_dict={self.net.isTraining : False,
+					self.net.trainingStep : self.dataManager.step,
+					self.net.inputImage : batch_x,
+					self.net.inputAngle : batch_x_angle,
+					self.net.groundTruth : batch_y})
+
 
 	def calculateTrainingLoss(self, session, batch_x, batch_x_angle, batch_y):
 		summary, lossValue, accuValue  =  session.run( [self.summaryOp,	self.lossOp, self.accuracyOp],
 								feed_dict={	self.net.isTraining : False,
+										self.net.trainingStep : self.dataManager.step,
 										self.net.inputImage : batch_x,
 										self.net.inputAngle : batch_x_angle,
 										self.net.groundTruth : batch_y})
@@ -89,6 +104,7 @@ class Solver:
 	def calculateValidationLossByWholeBatch(self, session, batch_x, batch_x_angle, batch_y):
 		summary, lossValue, accuValue  =  session.run( [self.summaryOp,	self.lossOp, self.accuracyOp],
 								feed_dict={	self.net.isTraining : False,
+										self.net.trainingStep : self.dataManager.step,
 										self.net.inputImage : self.validation_x,
 										self.net.inputAngle : self.validation_x_angle,
 										self.net.groundTruth : self.validation_y})
@@ -115,6 +131,7 @@ class Solver:
 			validaLabel = np.reshape(validaLabel, [1, 2])
 			lossValue, accuValue  =  session.run( [	self.lossOp, self.accuracyOp],
 								feed_dict={	self.net.isTraining : False,
+										self.net.trainingStep : self.dataManager.step,
 										self.net.inputImage : validaImage,
 										self.net.inputAngle : validaAngle,
 										self.net.groundTruth : validaLabel})

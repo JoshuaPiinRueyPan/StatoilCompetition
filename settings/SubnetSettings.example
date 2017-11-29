@@ -1,4 +1,8 @@
-from src.subnet.AlexnetTiny import *
+#from src.subnet.DarkNet19 import *
+#from src.subnet.FullConvAlexnetTiny import *
+from src.subnet.AlexnetTinyWithoutAngle import *
+from src.subnet.AlexnetBatchNorm import *
 
-def SubnetFactory(isTraining_, inputImage_, inputAngle_, groundTruth_):
-	return AlexnetTiny(isTraining_, inputImage_, inputAngle_, groundTruth_)
+def SubnetFactory(isTraining_, trainingStep, inputImage_, inputAngle_, groundTruth_):
+	#return AlexnetTinyWithoutAngle(isTraining_, trainingStep, inputImage_, inputAngle_, groundTruth_)
+	return AlexnetBatchNorm(isTraining_, trainingStep, inputImage_, inputAngle_, groundTruth_)
