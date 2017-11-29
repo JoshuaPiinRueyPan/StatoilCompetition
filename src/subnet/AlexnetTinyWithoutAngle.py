@@ -15,23 +15,23 @@ class AlexnetTinyWithoutAngle(SubnetBase):
 	def Build(self):
 		net = ConvLayer(self.inputImage, 3, 8, stride_=1, padding_='SAME', layerName_='conv1')
 		net = tf.nn.relu(net)
-		net = MaxPoolLayer(net, kernelSize=2, name='pool1')
-		net = AlexNorm(net, lsize=4, name='norm1')
+		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool1')
+		net = AlexNorm(net, lsize=4, layerName_='norm1')
 
 		net = ConvLayer(net, 3, 16, stride_=1, padding_='SAME', layerName_='conv2')
 		net = tf.nn.relu(net)
-		net = MaxPoolLayer(net, kernelSize=2, name='pool2')
-		net = AlexNorm(net, lsize=4, name='norm3')
+		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool2')
+		net = AlexNorm(net, lsize=4, layerName_='norm3')
 
 		net = ConvLayer(net, 3, 16, stride_=1, padding_='SAME', layerName_='conv3')
 		net = tf.nn.relu(net)
-		net = MaxPoolLayer(net, kernelSize=2, name='pool3')
-		net = AlexNorm(net, lsize=4, name='norm3')
+		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool3')
+		net = AlexNorm(net, lsize=4, layerName_='norm3')
 
 		net = ConvLayer(net, 3, 16, stride_=1, padding_='SAME', layerName_='conv4')
 		net = tf.nn.relu(net)
-		net = MaxPoolLayer(net, kernelSize=2, name='pool4')
-		net = AlexNorm(net, lsize=4, name='norm4')
+		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool4')
+		net = AlexNorm(net, lsize=4, layerName_='norm4')
 
 		net = FullyConnectedLayer(net, numberOfOutputs_=128)
 		net = tf.nn.relu(net)

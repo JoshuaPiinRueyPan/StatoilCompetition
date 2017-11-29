@@ -51,7 +51,7 @@ class Solver:
 					if self.dataManager.epoch >= trainSettings.EPOCHS_TO_START_SAVE_MODEL:
 						pathToSaveCheckpoint = os.path.join(trainSettings.PATH_TO_SAVE_MODEL, 
 										     "save_epoch_" + str(self.dataManager.epoch),
-										     "iceberg.ckpt")
+										     "icenet.ckpt")
 						self.saver.save(sess,  pathToSaveCheckpoint)
 			print("Optimization finished!")
 
