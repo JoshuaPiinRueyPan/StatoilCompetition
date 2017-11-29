@@ -10,7 +10,7 @@ import csv
 class Testing:
 	def __init__(self):
 		self.net = IceNet()
-		self.cost, self.accuracy = self.net.Build()
+		self.cost, self.accuracy, _ = self.net.Build()
 		print("Loading Test Set, please wait...")
 		self.dataManager = TestingDataManager(testSettings.TESTING_SET_PATH_NAME)
 		print("Loading finished.")
