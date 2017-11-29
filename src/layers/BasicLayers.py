@@ -1,5 +1,6 @@
 import tensorflow as tf
-from LayerHelper import *
+from src.layers.LayerHelper import *
+import settings.LayerSettings as layerSettings
 
 def ConvLayer(inputTensor_, filterSize_, numberOfFilters_, stride_=1, padding_='SAME', layerName_=None):
 	inputChannels = int(inputTensor_.shape[3])
@@ -54,7 +55,8 @@ def BatchNormalization(isTraining_, currentStep_, inputTensor_, isConvLayer_=Fal
 	    for average.  Therefore, one should add the training step to scale the previous
 	    steps down.
 	'''
-	averageCalculator = tf.train.ExponentialMovingAverage(decay=0.999, num_updates=currentStep_)
+	averageCalculator = tf.train.ExponentialMovingAverage(decay=layerSettings.BATCH_NORMALIZATION_MOVING_AVERAGE_DECAY_RATIO,
+							      num_updates=currentStep_)
 	updateVariablesOperation = averageCalculator.apply( [currentBatchMean, currentBatchVariance] )
 
 	totalMean = tf.cond(isTraining_,

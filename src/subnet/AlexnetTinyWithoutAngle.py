@@ -13,7 +13,7 @@ class AlexnetTinyWithoutAngle(SubnetBase):
 		self.dropoutValue = 0.5
 
 	def Build(self):
-		net = ConvLayer(self.inputImage, 3, 32, stride_=1, padding_='SAME', layerName_='conv1')
+		net = ConvLayer(self.inputImage, 3, 8, stride_=1, padding_='SAME', layerName_='conv1')
 		net = tf.nn.relu(net)
 		net = MaxPoolLayer(net, kernelSize=2, name='pool1')
 		net = AlexNorm(net, lsize=4, name='norm1')
@@ -23,7 +23,7 @@ class AlexnetTinyWithoutAngle(SubnetBase):
 		net = MaxPoolLayer(net, kernelSize=2, name='pool2')
 		net = AlexNorm(net, lsize=4, name='norm3')
 
-		net = ConvLayer(net, 3, 8, stride_=1, padding_='SAME', layerName_='conv3')
+		net = ConvLayer(net, 3, 16, stride_=1, padding_='SAME', layerName_='conv3')
 		net = tf.nn.relu(net)
 		net = MaxPoolLayer(net, kernelSize=2, name='pool3')
 		net = AlexNorm(net, lsize=4, name='norm3')

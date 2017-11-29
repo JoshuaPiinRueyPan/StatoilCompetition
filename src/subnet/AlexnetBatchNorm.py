@@ -13,15 +13,17 @@ class AlexnetBatchNorm(SubnetBase):
 		self.dropoutValue = 0.5
 
 	def Build(self):
-		net = ConvLayer(self.inputImage, 3, 32, stride_=1, padding_='SAME', layerName_='conv1')
+		net = ConvLayer(self.inputImage, 3, 8, stride_=1, padding_='SAME', layerName_='conv1')
 		net, updateVariablesOp1 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
 		net = tf.nn.relu(net)
+		net = MaxPoolLayer(net, kernelSize=2, name='pool1')
 
 		net = ConvLayer(net, 3, 16, stride_=1, padding_='SAME', layerName_='conv2')
 		net, updateVariablesOp2 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
 		net = tf.nn.relu(net)
+		net = MaxPoolLayer(net, kernelSize=2, name='pool2')
 
-		net = ConvLayer(net, 3, 8, stride_=1, padding_='SAME', layerName_='conv3')
+		net = ConvLayer(net, 3, 16, stride_=1, padding_='SAME', layerName_='conv3')
 		net, updateVariablesOp3 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
 		net = tf.nn.relu(net)
 		net = MaxPoolLayer(net, kernelSize=2, name='pool3')

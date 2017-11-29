@@ -16,7 +16,7 @@ class Solver:
 
 		# Net
 		self.net = IceNet()
-		self.lossOp, self.accuracyOp, self.updateOp = self.net.Build()
+		self.lossOp, self.accuracyOp, self.updateNetOp = self.net.Build()
 
 		# Optimizer
 		self.learningRate = tf.placeholder(tf.float32, shape=[])
@@ -80,7 +80,7 @@ class Solver:
 		    Some Network has variables that need to be updated after training (e.g. the net with
 		    batch normalization).  After training, following code update such variables.
 		'''
-		session.run( self.updateOp,
+		session.run( self.updateNetOp,
 			     feed_dict={self.net.isTraining : False,
 					self.net.trainingStep : self.dataManager.step,
 					self.net.inputImage : batch_x,
