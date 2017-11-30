@@ -47,3 +47,5 @@ def CountElementsInOneFeatureMap(inputTensor_):
 	'''
 	featureMapShape = inputTensor_.shape[1:]
 	return int( np.prod(featureMapShape) )
+
+

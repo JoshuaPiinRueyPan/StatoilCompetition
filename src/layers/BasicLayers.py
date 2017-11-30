@@ -30,6 +30,18 @@ def FullyConnectedLayer(inputTensor_, numberOfOutputs_, layerName_=None):
 def LeakyRELU(inputTensor_, layerName_="LeakyRELU"):
 	return tf.maximum(layerSettings.LEAKY_RELU_FACTOR*inputTensor_, inputTensor_, name=layerName_)
 
+def SetActivation(inputTensor_, activationType_):
+	if activationType_.upper() == "RELU":
+		return tf.nn.relu(inputTensor_)
+
+	elif activationType_.upper() == "LEAKY_RELU":
+		return LeakyRELU(inputTensor_)
+
+	else:
+		errorMessage = "You may add a new Activation type: '" + activationType_.upper() + "'\n"
+		errorMessage += "but not implement in SetActivation()"
+		raise ValueError(errorMessage)
+
 def AlexNorm(inputTensor, lsize=4, layerName_=None):
 	return tf.nn.lrn(inputTensor, lsize, bias=1.0, alpha=0.001/9.0, beta=0.75, name=layerName_)
 
