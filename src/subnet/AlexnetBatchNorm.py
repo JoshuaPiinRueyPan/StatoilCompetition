@@ -46,10 +46,8 @@ class AlexnetBatchNorm(SubnetBase):
 		net = tf.cond(self.isTraining, lambda: tf.nn.dropout(net, self.dropoutValue), lambda: net)
 
 		net = FullyConnectedLayer(net, numberOfOutputs_=outSettings.NUMBER_OF_CATEGORIES)
-		net, updateVariablesOp7 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=False)
 
 		updateVariablesOperations = tf.group(updateVariablesOp1, updateVariablesOp2, updateVariablesOp3,
-						    updateVariablesOp4, updateVariablesOp5, updateVariablesOp6,
-						    updateVariablesOp7)
+						    updateVariablesOp4, updateVariablesOp5, updateVariablesOp6)
 		return net, updateVariablesOperations
 
