@@ -12,67 +12,52 @@ class FullConvAlexnetTiny(SubnetBase):
 
 	    Note: In the last layer, both the AvgPool and MaxPool are worse here.
 	'''
-	def __init__(self, isTraining_, inputImage_, inputAngle_, groundTruth_):
+	def __init__(self, isTraining_, trainingStep_, inputImage_, inputAngle_, groundTruth_):
 		self.isTraining = isTraining_
+		self.trainingStep = trainingStep_
 		self.inputImage = inputImage_
 		self.inputAngle = inputAngle_
 		self.groundTruth = groundTruth_
 
 	def Build(self):
-		weights, biases = self.buildNetVariables()
-		return self.buildNetBody(weights, biases)
-
-	def buildNetVariables(self):
-		weights = {
-			'convW1': tf.Variable(tf.random_normal([3, 3, 2, 32], stddev=0.01)),
-			'convW2': tf.Variable(tf.random_normal([3, 3, 32, 64], stddev=0.01)),
-			'convW3': tf.Variable(tf.random_normal([3, 3, 64, 128], stddev=0.01)),
-			'convW4': tf.Variable(tf.random_normal([1, 1, 128, 64], stddev=0.01)),
-			'convW5': tf.Variable(tf.random_normal([3, 3, 64, 128], stddev=0.01)),
-			'convW6': tf.Variable(tf.random_normal([3, 3, 128, 256], stddev=0.01)),
-			'convW1x1' : tf.Variable(tf.random_normal([1, 1, 256, 2], stddev=0.01)),
-		}
-
-		biases = {
-			'convb1': tf.Variable(tf.random_normal([32], stddev=0.01)),
-			'convb2': tf.Variable(tf.random_normal([64], stddev=0.01)),
-			'convb3': tf.Variable(tf.random_normal([128], stddev=0.01)),
-			'convb4': tf.Variable(tf.random_normal([64], stddev=0.01)),
-			'convb5': tf.Variable(tf.random_normal([128], stddev=0.01)),
-			'convb6': tf.Variable(tf.random_normal([256], stddev=0.01)),
-			'convb1x1' : tf.Variable(tf.random_normal([2], stddev=0.01)),
-		}
-		return weights, biases
-
-	def buildNetBody(self, weights, biases):
-		net = ConvLayer(self.inputImage, weights['convW1'], biases['convb1'], layerName_='conv1')
+		net = ConvLayer(self.inputImage, 3, 32, stride_=1, padding_='SAME', layerName_='conv1')
+		net, updateVariablesOp1 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = LeakyRELU(net)
 		net = MaxPoolLayer(net, kernelSize=2)
-		net = AlexNorm(net, lsize=4)
 
-		net = ConvLayer(net, weights['convW2'], biases['convb2'], layerName_='conv2')
+		net = ConvLayer(net, 3, 64, stride_=1, padding_='SAME', layerName_='conv2')
+		net, updateVariablesOp2 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = LeakyRELU(net)
 		net = MaxPoolLayer(net, kernelSize=2)
-		net = AlexNorm(net, lsize=4)
 
-		net = ConvLayer(net, weights['convW3'], biases['convb3'], layerName_='conv3')
-		net = AlexNorm(net, lsize=4)
+		net = ConvLayer(net, 3, 128, stride_=1, padding_='SAME', layerName_='conv3')
+		net, updateVariablesOp3 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = LeakyRELU(net)
 
-		net = ConvLayer(net, weights['convW4'], biases['convb4'], layerName_='conv4')
-		net = AlexNorm(net, lsize=4)
+		net = ConvLayer(net, 3, 64, stride_=1, padding_='SAME', layerName_='conv4')
+		net, updateVariablesOp4 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = LeakyRELU(net)
 
-		net = ConvLayer(net, weights['convW5'], biases['convb5'], layerName_='conv5')
+		net = ConvLayer(net, 3, 128, stride_=1, padding_='SAME', layerName_='conv5')
+		net, updateVariablesOp5 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = LeakyRELU(net)
 		net = MaxPoolLayer(net, kernelSize=2)
-		net = AlexNorm(net, lsize=4)
 
-		net = ConvLayer(net, weights['convW6'], biases['convb6'], layerName_='conv6')
-		net = AlexNorm(net, lsize=4)
 
-		net = ConvLayer(net, weights['convW1x1'], biases['convb1x1'], padding='VALID', layerName_='conv1x1')
+		net = ConvLayer(net, 3, 256, stride_=1, padding_='SAME', layerName_='conv6')
+		net, updateVariablesOp6 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = LeakyRELU(net)
 
-		print("conv.shape = " + str(net.shape))
+		net = ConvLayer(net, 1, 2, stride_=1, padding_='SAME', layerName_='conv7')
+		net, updateVariablesOp7 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = LeakyRELU(net)
+
 		#net = AvgPoolLayer(net, kernelSize=10, layerName_='poolFinal')
 		net = MaxPoolLayer(net, kernelSize=10, layerName_='poolFinal')
 		output = tf.reshape(net, shape=[-1, 2])
 
-		
-		return output
+		updateVariablesOperations = tf.group(updateVariablesOp1, updateVariablesOp2, updateVariablesOp3,
+						    updateVariablesOp4, updateVariablesOp5, updateVariablesOp6,
+						    updateVariablesOp7)
+		return output, updateVariablesOperations
 
