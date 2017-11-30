@@ -81,8 +81,9 @@ class DarkNet19(SubnetBase):
 		net = ConvLayer(self.inputImage, 1, 2, stride_=1, padding_='SAME', layerName_='conv19')
 		net, updateVariablesOp19 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
 		net = LeakyRELU(net)
-		net = AvgPoolLayer(net, kernelSize=3, layerName_='poolFinal')
-		net = MaxPoolLayer(net, kernelSize=5, layerName_='poolFinal')
+
+		net = AvgPoolLayer(net, kernelSize=75, layerName_='poolFinal')
+		#net = MaxPoolLayer(net, kernelSize=75, layerName_='poolFinal')
 		output = tf.reshape(net, shape=[-1, 2])
 
 		updateVariablesOperations = tf.group(updateVariablesOp1, updateVariablesOp2, updateVariablesOp3,
@@ -92,5 +93,5 @@ class DarkNet19(SubnetBase):
 						     updateVariablesOp13, updateVariablesOp14, updateVariablesOp15,
 						     updateVariablesOp16, updateVariablesOp17, updateVariablesOp18,
 						     updateVariablesOp19)
-		return output
+		return output, updateVariablesOperations
 
