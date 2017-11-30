@@ -16,7 +16,7 @@ class AlexnetBatchNorm(SubnetBase):
 		net = ConvLayer(self.inputImage, 3, 8, stride_=1, padding_='SAME', layerName_='conv1')
 		net, updateVariablesOp1 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
 		net = tf.nn.relu(net)
-		net = MaxPoolLayer(net, kernelSize=2, layerName='pool1')
+		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool1')
 
 		net = ConvLayer(net, 3, 16, stride_=1, padding_='SAME', layerName_='conv2')
 		net, updateVariablesOp2 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
