@@ -12,11 +12,11 @@ class DarkNet19(SubnetBase):
 
 	def Build(self):
 		net = ConvLayer(self.inputImage, 3, 32, stride_=1, padding_='SAME', layerName_='conv1')
-		net = MaxPoolLayer(net, kernelSize=2, name='pool1')
+		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool1')
 		net = AlexNorm(inputTensor=net)
 
 		net = ConvLayer(self.inputImage, 3, 64, stride_=1, padding_='SAME', layerName_='conv2')
-		net = MaxPoolLayer(net, kernelSize=2, name='pool2')
+		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool2')
 		net = AlexNorm(inputTensor=net)
 
 		net = ConvLayer(self.inputImage, 3, 128, stride_=1, padding_='SAME', layerName_='conv3')
@@ -24,7 +24,7 @@ class DarkNet19(SubnetBase):
 		net = ConvLayer(self.inputImage, 1, 64, stride_=1, padding_='SAME', layerName_='conv4')
 		net = AlexNorm(inputTensor=net)
 		net = ConvLayer(self.inputImage, 3, 128, stride_=1, padding_='SAME', layerName_='conv5')
-		net = MaxPoolLayer(net, kernelSize=2, name='pool2')
+		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool2')
 		net = AlexNorm(inputTensor=net)
 
 		net = ConvLayer(self.inputImage, 3, 256, stride_=1, padding_='SAME', layerName_='conv6')
@@ -32,7 +32,7 @@ class DarkNet19(SubnetBase):
 		net = ConvLayer(self.inputImage, 1, 128, stride_=1, padding_='SAME', layerName_='conv7')
 		net = AlexNorm(inputTensor=net)
 		net = ConvLayer(self.inputImage, 3, 256, stride_=1, padding_='SAME', layerName_='conv8')
-		net = MaxPoolLayer(net, kernelSize=2, name='pool2')
+		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool2')
 		net = AlexNorm(inputTensor=net)
 
 
@@ -46,7 +46,7 @@ class DarkNet19(SubnetBase):
 		net = ConvLayer(self.inputImage, 1, 256, stride_=1, padding_='SAME', layerName_='conv12')
 		net = AlexNorm(inputTensor=net)
 		net = ConvLayer(self.inputImage, 3, 512, stride_=1, padding_='SAME', layerName_='conv13')
-		net = MaxPoolLayer(net, kernelSize=2, name='pool2')
+		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool2')
 
 		net = ConvLayer(self.inputImage, 3, 1024, stride_=1, padding_='SAME', layerName_='conv14')
 		net = AlexNorm(inputTensor=net)
@@ -59,8 +59,8 @@ class DarkNet19(SubnetBase):
 		net = ConvLayer(self.inputImage, 3, 1024, stride_=1, padding_='SAME', layerName_='conv18')
 		net = AlexNorm(inputTensor=net)
 		net = ConvLayer(self.inputImage, 1, 2, stride_=1, padding_='SAME', layerName_='conv19')
-		net = AvgPoolLayer(net, kernelSize=3, name='poolFinal')
-		net = MaxPoolLayer(net, kernelSize=5, name='poolFinal')
+		net = AvgPoolLayer(net, kernelSize=3, layerName_='poolFinal')
+		net = MaxPoolLayer(net, kernelSize=5, layerName_='poolFinal')
 		output = tf.reshape(net, shape=[-1, 2])
 
 		return output

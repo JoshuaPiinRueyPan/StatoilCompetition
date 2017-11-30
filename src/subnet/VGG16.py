@@ -9,8 +9,9 @@ VGG_MODEL_PATH = "data/VGG/vgg16.npy"
 VGG_INPUT_SIZE = [224, 224]
 
 class VGG16(SubnetBase):
-	def __init__(self, isTraining_, inputImage_, inputAngle_, groundTruth_):
+	def __init__(self, isTraining_, trainingStep_, inputImage_, inputAngle_, groundTruth_):
 		self.isTraining = isTraining_
+		self.trainingStep = trainingStep_
 		self.inputImage = inputImage_
 		self.inputAngle = inputAngle_
 		self.groundTruth = groundTruth_
@@ -63,7 +64,7 @@ class VGG16(SubnetBase):
 		fcFinal = self.fc_layer(self.relu7, 4096, 2, "fcFinal")
 
 		self.data_dict = None
-		return fcFinal
+		return fcFinal, tf.no_op()
 
 
 	def transformInputToVGG_Input(self):

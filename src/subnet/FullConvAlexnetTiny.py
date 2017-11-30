@@ -45,32 +45,32 @@ class FullConvAlexnetTiny(SubnetBase):
 		return weights, biases
 
 	def buildNetBody(self, weights, biases):
-		net = ConvLayer(self.inputImage, weights['convW1'], biases['convb1'], name='conv1')
+		net = ConvLayer(self.inputImage, weights['convW1'], biases['convb1'], layerName_='conv1')
 		net = MaxPoolLayer(net, kernelSize=2)
 		net = AlexNorm(net, lsize=4)
 
-		net = ConvLayer(net, weights['convW2'], biases['convb2'], name='conv2')
+		net = ConvLayer(net, weights['convW2'], biases['convb2'], layerName_='conv2')
 		net = MaxPoolLayer(net, kernelSize=2)
 		net = AlexNorm(net, lsize=4)
 
-		net = ConvLayer(net, weights['convW3'], biases['convb3'], name='conv3')
+		net = ConvLayer(net, weights['convW3'], biases['convb3'], layerName_='conv3')
 		net = AlexNorm(net, lsize=4)
 
-		net = ConvLayer(net, weights['convW4'], biases['convb4'], name='conv4')
+		net = ConvLayer(net, weights['convW4'], biases['convb4'], layerName_='conv4')
 		net = AlexNorm(net, lsize=4)
 
-		net = ConvLayer(net, weights['convW5'], biases['convb5'], name='conv5')
+		net = ConvLayer(net, weights['convW5'], biases['convb5'], layerName_='conv5')
 		net = MaxPoolLayer(net, kernelSize=2)
 		net = AlexNorm(net, lsize=4)
 
-		net = ConvLayer(net, weights['convW6'], biases['convb6'], name='conv6')
+		net = ConvLayer(net, weights['convW6'], biases['convb6'], layerName_='conv6')
 		net = AlexNorm(net, lsize=4)
 
-		net = ConvLayer(net, weights['convW1x1'], biases['convb1x1'], padding='VALID', name='conv1x1')
+		net = ConvLayer(net, weights['convW1x1'], biases['convb1x1'], padding='VALID', layerName_='conv1x1')
 
 		print("conv.shape = " + str(net.shape))
-		#net = AvgPoolLayer(net, kernelSize=10, name='poolFinal')
-		net = MaxPoolLayer(net, kernelSize=10, name='poolFinal')
+		#net = AvgPoolLayer(net, kernelSize=10, layerName_='poolFinal')
+		net = MaxPoolLayer(net, kernelSize=10, layerName_='poolFinal')
 		output = tf.reshape(net, shape=[-1, 2])
 
 		
