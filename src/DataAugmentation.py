@@ -47,6 +47,13 @@ class DataAugmentation:
 		image = cv2.warpAffine(image, RotationMatrix, (rows,cols))
 		return image
 
+	def _mergeTwoImages(self, foreground_, background_):
+		alpha = 0.7
+		result = None
+		cv2.addWeighted(foreground_, alpha, background_, (1.0 - alpha), result)
+
+		return result
+
 	def _horizontalFlip(self, image, PROBILITY_THRESHOLD_=0.5):
 		randomValue = np.random.random()
 		if randomValue < PROBILITY_THRESHOLD_:
