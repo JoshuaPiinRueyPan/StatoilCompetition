@@ -4,7 +4,7 @@ from src.layers.BasicLayers import *
 from src.layers.ResidualLayers import *
 import settings.OutputSettings as outSettings
 
-class ResnetTiny(SubnetBase):
+class ResnetTinyFat(SubnetBase):
 	def __init__(self, isTraining_, trainingStep_, inputImage_, inputAngle_, groundTruth_):
 		self.isTraining = isTraining_
 		self.trainingStep = trainingStep_
