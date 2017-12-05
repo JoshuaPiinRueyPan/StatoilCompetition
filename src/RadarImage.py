@@ -6,61 +6,60 @@ DATA_WIDTH = 75
 DATA_HEIGHT = 75
 DATA_CHANNELS = 2
 
+MAX_IMAGE_VALUE = 1.0
+
 def ScaleArrayToNormalImageValue(array, maxValue_, minValue_):
-	scale = 255. / (maxValue_ - minValue_)
+	scale = MAX_IMAGE_VALUE / (maxValue_ - minValue_)
 	array = (array - minValue_) * scale
-	return array.astype(np.uint8)
+	return array
 
 
 class RadarImage:
+	'''
+	    This class store each data value in the range [0, 1].
+	    Note: If you want to draw image, you should multipy
+		  the returned image by 255.0
+	'''
 	def NormalizeImage(self, maxHH_, minHH_, maxHV_, minHV_):
 		self.dataHH = ScaleArrayToNormalImageValue(self.dataHH, maxHH_, minHH_)
 		self.dataHV = ScaleArrayToNormalImageValue(self.dataHV, maxHV_, minHV_)
 		self.isNormalized = True
 
 	def GetImageHH(self):
+		'''
+		    Return: Numpy array in (75, 75), value range: [0, 1]
+		'''
 		if not self.isNormalized:
 			raise UserWarning("You should Normalize RadarImage before you use it!")
 		else:
-			singleChannelImage = np.reshape(self.dataHH, (DATA_WIDTH, DATA_HEIGHT))
-			normalImage = cv2.cvtColor(singleChannelImage, cv2.COLOR_GRAY2BGR)
-			return normalImage
+			return np.reshape(self.dataHH, (DATA_WIDTH, DATA_HEIGHT))
 
 	def GetImageHV(self):
+		'''
+		    Return: Numpy array in (75, 75), value range: [0, 1]
+		'''
 		if not self.isNormalized:
 			raise UserWarning("You should Normalize RadarImage before you use it!")
 		else:
-			singleChannelImage = np.reshape(self.dataHV, (DATA_WIDTH, DATA_HEIGHT))
-			normalImage = cv2.cvtColor(singleChannelImage, cv2.COLOR_GRAY2BGR)
-			return normalImage
+			return np.reshape(self.dataHV, (DATA_WIDTH, DATA_HEIGHT))
 
-	def GetTotalImage(self, shouldConcatenateAngle_=True):
+	def GetTotalImage(self):
+		'''
+		    Return: Numpy array in (75, 75, 2), value range: [0, 1]
+		'''
 		if not self.isNormalized:
 			raise UserWarning("You should Normalize RadarImage before you use it!")
-		else:
-			stuffValue = 0
-			if self.hasAngle:
-				scaleAngle = 255./90.  # In theory, maxAngle = 90
-				stuffValue = (np.array(self.angle) * scaleAngle).astype(np.uint8)
-			else:
-				stuffValue = np.array(0)
 
+		else:
 			imageHH = np.reshape(self.dataHH, (DATA_WIDTH, DATA_HEIGHT))
 			imageHV = np.reshape(self.dataHV, (DATA_WIDTH, DATA_HEIGHT))
 
-			if shouldConcatenateAngle_:
-				imageAngleChannel = np.tile(stuffValue, (DATA_WIDTH, DATA_HEIGHT)).astype(np.uint8)
-				
-				temp = np.stack((imageHH, imageHV, imageAngleChannel))
-				'''
-				    After stacked, the shape will be: (3, 75, 75),
-				    we need to transpose it back.
-				'''
-				return np.transpose(temp, (1, 2, 0))
-
-			else:
-				temp = np.stack((imageHH, imageHV))
-				return np.transpose(temp, (1, 2, 0))
+			'''
+			    After stacked, the shape will be: (2, 75, 75),
+			    we need to transpose it back.
+			'''
+			temp = np.stack((imageHH, imageHV))
+			return np.transpose(temp, (1, 2, 0))
 
 	def __init__(self, statoilData_):
 		self.name = statoilData_["id"]

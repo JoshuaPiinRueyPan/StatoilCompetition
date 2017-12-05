@@ -22,24 +22,22 @@ class DataDrawer:
 	def drawEachRadarImage(self, radarImage_, TARGET_DIRECTORY_):
 		imageName = radarImage_.name
 
-		imageHH = radarImage_.GetImageHH()
+		imageHH = (radarImage_.GetImageHH() * 255.0).astype(np.uint8)
+		#imageHH = cv2.cvtColor(imageHH, cv2.COLOR_GRAY2BGR)
 		imageHH = self.resizeImageToTargetSize(imageHH)
-		self.appendInfoToImage("HH", imageHH, radarImage_)
+		self.writeInfoToImage("HH", imageHH, radarImage_)
 
-		imageHV = radarImage_.GetImageHV()
+		imageHV = (radarImage_.GetImageHV() * 255.0).astype(np.uint8)
+		#imageHV = cv2.cvtColor(imageHV, cv2.COLOR_GRAY2BGR)
 		imageHV = self.resizeImageToTargetSize(imageHV)
-		self.appendInfoToImage("HV", imageHV, radarImage_)
+		self.writeInfoToImage("HV", imageHV, radarImage_)
 
-		imageTotal = radarImage_.GetTotalImage()
-		imageTotal = self.resizeImageToTargetSize(imageTotal)
-		self.appendInfoToImage("Total", imageTotal, radarImage_)
-
-		self.saveEachRadarImage(TARGET_DIRECTORY_, radarImage_, imageHH, imageHV, imageTotal)
+		self.saveEachRadarImage(TARGET_DIRECTORY_, radarImage_, imageHH, imageHV)
 			
 	def resizeImageToTargetSize(self, image_):
 		return cv2.resize(image_, (self.SCALE_OF_TARGET_IMAGE*image_.shape[0], self.SCALE_OF_TARGET_IMAGE*image_.shape[1]) )
 
-	def appendInfoToImage(self, prefix_, image_, radarImage_):
+	def writeInfoToImage(self, prefix_, image_, radarImage_):
 		categoryInfo = "?"
 		if radarImage_.hasAnswer:
 			if radarImage_.isIceberg:
@@ -52,7 +50,7 @@ class DataDrawer:
 		imageInfo = prefix_  + ";  "  + categoryInfo + ";  angle: " + angleInfo
 		cv2.putText(image_, imageInfo, (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
 
-	def saveEachRadarImage(self, TARGET_DIRECTORY_, radarImage_, imageHH_, imageHV_, imageTotal_):
+	def saveEachRadarImage(self, TARGET_DIRECTORY_, radarImage_, imageHH_, imageHV_):
 		pathToSaveImageHH = radarImage_.name + "_HH.jpg"
 		pathToSaveImageHV = radarImage_.name + "_HV.jpg"
 		pathToSaveTotalImage = radarImage_.name + "_total.jpg"
@@ -70,7 +68,6 @@ class DataDrawer:
 
 		cv2.imwrite(pathToSaveImageHH, imageHH_)
 		cv2.imwrite(pathToSaveImageHV, imageHV_)
-		cv2.imwrite(pathToSaveTotalImage, imageTotal_)
 
 
 if __name__ == "__main__":

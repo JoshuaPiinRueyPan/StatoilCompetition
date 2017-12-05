@@ -26,7 +26,7 @@ class TrainingDataManager:
 		outputIndex = 0
 		while outputIndex < BATCH_SIZE_:
 			currentRadarImage = self.listOfTrainingData[self.cursor]
-			porcessedImage = self.DataAugmentation.Augment(currentRadarImage.GetTotalImage(False))
+			porcessedImage, _ = self.DataAugmentation.Augment(currentRadarImage.GetTotalImage(False))
 			arrayOfImages[outputIndex, :, :, :] = porcessedImage
 			arrayOfAngles[outputIndex, :] = currentRadarImage.angle
 			if currentRadarImage.hasAnswer:
