@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import settings.DataAugmentSettings as dataAugmentSettings
-import RadarImage
 
 class DataAugmentation:
 	def Augment(self, inputImage_):
