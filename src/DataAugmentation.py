@@ -138,7 +138,7 @@ class DataAugmentation:
 
 		origine = np.array( [0, 0] )
 		sizeDiff = np.array(enlargedImage.shape[:2]) - inputShape
-		upperLeftPoint = origine + sizeDiff/2
+		upperLeftPoint = (origine + sizeDiff/2).astype(np.int)
 		lowerRightPoint = upperLeftPoint + inputShape
 
 		'''
