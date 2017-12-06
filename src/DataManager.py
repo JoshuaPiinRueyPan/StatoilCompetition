@@ -26,7 +26,7 @@ class TrainingDataManager:
 		outputIndex = 0
 		while outputIndex < BATCH_SIZE_:
 			currentRadarImage = self.listOfTrainingData[self.cursor]
-			porcessedImage, _ = self.DataAugmentation.Augment(currentRadarImage.GetTotalImage(False))
+			porcessedImage, _ = self.DataAugmentation.Augment(currentRadarImage.GetTotalImage())
 			arrayOfImages[outputIndex, :, :, :] = porcessedImage
 			arrayOfAngles[outputIndex, :] = currentRadarImage.angle
 			if currentRadarImage.hasAnswer:
@@ -53,7 +53,7 @@ class TrainingDataManager:
 
 		for i in range(NUMBER_OF_VALIDATION_DATA):
 			currentRadarImage = self.listOfValidationData[i]
-			arrayOfImages[i, :, :, :] = currentRadarImage.GetTotalImage(False)
+			arrayOfImages[i, :, :, :] = currentRadarImage.GetTotalImage()
 			arrayOfAngles[i, :] = currentRadarImage.angle
 			if currentRadarImage.hasAnswer:
 				if currentRadarImage.isIceberg:
@@ -78,7 +78,7 @@ class TestingDataManager:
 
 		for i in range(NUMBER_OF_TESTING_DATA):
 			currentRadarImage = self.listOfRadarImages[i]
-			arrayOfImages[i, :, :, :] = currentRadarImage.GetTotalImage(False)
+			arrayOfImages[i, :, :, :] = currentRadarImage.GetTotalImage()
 			arrayOfAngles[i, :] = currentRadarImage.angle
 			listOfIDs.append(currentRadarImage.name)
 
