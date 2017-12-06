@@ -73,14 +73,17 @@ class DataAugmentation:
 
 		return image, operations
 
-	def Rotate(self, inputImage_):
-		rows,cols = inputImage_.shape[:2]
-		angle = np.random.uniform(low=0., high=360.0)
-		RotationMatrix = cv2.getRotationMatrix2D((cols/2, rows/2), angle, 1)
-		tempImage = cv2.warpAffine(inputImage_, RotationMatrix, (rows,cols), flags=cv2.INTER_NEAREST)
-		operations = " Rotate:" + "{0:.2f}".format(angle) + ";"
+	def Rotate(self, image, PROBILITY_THRESHOLD_=0.7):
+		operations = ""
+		probability = np.random.random()
+		if probability < PROBILITY_THRESHOLD_:
+			rows,cols = image.shape[:2]
+			angle = np.random.uniform(low=0., high=360.0)
+			RotationMatrix = cv2.getRotationMatrix2D((cols/2, rows/2), angle, 1)
+			image = cv2.warpAffine(image, RotationMatrix, (rows,cols), flags=cv2.INTER_NEAREST)
+			operations = " Rotate:" + "{0:.2f}".format(angle) + ";"
 
-		return tempImage, operations
+		return image, operations
 
 	def _mergeTwoImages(self, foreground_, background_):
 		THRESHOLD = 1e-6
