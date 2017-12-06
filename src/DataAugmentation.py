@@ -158,7 +158,7 @@ class DataAugmentation:
 		result = np.zeros(inputImage_.shape)
 		origine = np.array( [0, 0] )
 		sizeDiff = np.array(result.shape[:2]) - shrinkedShape
-		upperLeftPoint = origine + sizeDiff/2
+		upperLeftPoint = (origine + sizeDiff/2).astype(np.int)
 		lowerRightPoint = upperLeftPoint + shrinkedShape
 
 		result[upperLeftPoint[1]:lowerRightPoint[1], upperLeftPoint[0]:lowerRightPoint[0]] = shrinkedImage
