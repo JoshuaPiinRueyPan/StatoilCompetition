@@ -7,16 +7,31 @@ from src.DataAugmentation import *
 
 class DataShow:
 	def ShowAugmentation(self, listOfRadarImage_):
-		for eachRadarImage in listOfRadarImage_:
-			self.drawEachRadarImage(eachRadarImage)
+		NUMBER_OF_DATA = len(listOfRadarImage_)
+		index = 0
+		while True:
+			currentImage = listOfRadarImage_[index]
+			self.drawEachRadarImage(currentImage)
 			cv2.imshow("AugumentData", self.canvas)
 			userResponse = cv2.waitKey(0)
 			if userResponse == ord('n'):
+				index += 1
+				self.canvas.fill(0)
+
+			elif userResponse == ord('p'):
+				index -= 1
 				self.canvas.fill(0)
 
 			elif userResponse == ord('q'):
 				cv2.destroyAllWindows()
 				exit()
+
+			if index >= NUMBER_OF_DATA:
+				index = 0
+
+			elif index < 0:
+				index = NUMBER_OF_DATA - 1
+
 
 	def __init__(self):
 		self.dataAugmentation = DataAugmentation()
