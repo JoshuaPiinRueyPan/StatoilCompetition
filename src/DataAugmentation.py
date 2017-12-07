@@ -1,82 +1,84 @@
 import cv2
 import numpy as np
-import settings.DataAugmentSettings as dataAugmentSettings
+import settings.DataAugmentSettings as settings
 
 class DataAugmentation:
 	def Augment(self, inputImage_):
 		performedOperations = ""
 		tempImage = inputImage_
-		if dataAugmentSettings.FLIP:
-			tempImage, tempOp = self.Flip(tempImage)
-			performedOperations += tempOp
+		# Flip
+		tempImage, tempOp = self.Flip(tempImage)
+		performedOperations += tempOp
 
-		if dataAugmentSettings.ZOOM:
-			tempImage, tempOp = self.Zoom(tempImage)
-			performedOperations += tempOp
+		# Shift
+		tempImage, tempOp = self.Shift(tempImage)
+		performedOperations += tempOp
 
-		if dataAugmentSettings.SHIFT:
-			tempImage, tempOp = self.Shift(tempImage)
-			performedOperations += tempOp
+		# Rotate
+		tempImage, tempOp = self.Rotate(tempImage)
+		performedOperations += tempOp
 
-		if dataAugmentSettings.ROTATE:
-			tempImage, tempOp = self.Rotate(tempImage)
-			performedOperations += tempOp
+		# Zoom
+		tempImage, tempOp = self.Zoom(tempImage)
+		performedOperations += tempOp
 
 		mergedImage = self._mergeTwoImages(foreground_=tempImage, background_=inputImage_)
-		#mergedImage = tempImage
 
 		return mergedImage, performedOperations
 
 	def __init__(self):
 		pass
 
-	def Flip(self, image, PROBILITY_THRESHOLD_=0.5):
+	def Flip(self, image):
 		operations = ""
 		probability = np.random.random()
-		if probability < PROBILITY_THRESHOLD_:
-			image = self._horizontalFlip(image, PROBILITY_THRESHOLD_)
+		if probability < settings.PROBABILITY_TO_FLIP_IMAGE:
+			image = self._horizontalFlip(image)
 			operations += " H-Flip;"
 
 		probability = np.random.random()
-		if probability < PROBILITY_THRESHOLD_:
-			image = self._verticalFlip(image, PROBILITY_THRESHOLD_)
+		if probability < settings.PROBABILITY_TO_FLIP_IMAGE:
+			image = self._verticalFlip(image)
 			operations += " V-Flip;"
 
 		return image, operations
 
 
 
-	def Zoom(self, image, PROBILITY_THRESHOLD_=0.33):
+	def Zoom(self, image):
 		operations = ""
 		probability = np.random.random()
-		if probability < PROBILITY_THRESHOLD_:
-			image = self._zoomIn(image)
-			operations += " ZoomIn;"
+		if probability < settings.PROBABILITY_TO_ZOOM_IMAGE:
+			zoomInProbility = np.random.random()
+			ZOOM_IN_THRESHOLD = 0.5
+			if zoomInProbility < ZOOM_IN_THRESHOLD:
+				image = self._zoomIn(image)
+				operations += " ZoomIn;"
 
-		elif probability < 2*PROBILITY_THRESHOLD_:
-			image = self._zoomOut(image)
-			operations += " ZoomOut;"
+			else:
+				image = self._zoomOut(image)
+				operations += " ZoomOut;"
 
 		return image, operations
 
-	def Shift(self, image, PROBILITY_THRESHOLD_=0.5):
+	def Shift(self, image):
 		operations = ""
 		probability = np.random.random()
-		if probability < PROBILITY_THRESHOLD_:
+		if probability < settings.PROBABILITY_TO_SHIFT_IMAGE:
 			image = self._horizontalShift(image)
 			operations += " H-Shift;"
 
 		probability = np.random.random()
-		if probability < PROBILITY_THRESHOLD_:
+		if probability < settings.PROBABILITY_TO_SHIFT_IMAGE:
 			image = self._verticalShift(image)
 			operations += " V-Shift;"
 
 		return image, operations
 
-	def Rotate(self, image, PROBILITY_THRESHOLD_=0.7):
+	def Rotate(self, image):
 		operations = ""
 		probability = np.random.random()
-		if probability < PROBILITY_THRESHOLD_:
+		if probability < settings.PROBABILITY_TO_ROTATE_IMAGE:
 			rows,cols = image.shape[:2]
 			angle = np.random.uniform(low=0., high=360.0)
 			RotationMatrix = cv2.getRotationMatrix2D((cols/2, rows/2), angle, 1)
@@ -93,10 +95,10 @@ class DataAugmentation:
 		return result
 
 
-	def _horizontalFlip(self, image, PROBILITY_THRESHOLD_=0.5):
+	def _horizontalFlip(self, image):
 		return cv2.flip(image, 1)
 
-	def _verticalFlip(self, image, PROBILITY_THRESHOLD_=0.5):
+	def _verticalFlip(self, image):
 		return cv2.flip(image, 0)
 
 	def _horizontalShift(self, image):
@@ -113,25 +115,6 @@ class DataAugmentation:
 		image = cv2.warpAffine(image, shiftMatrix, image.shape[:2], flags=cv2.INTER_NEAREST)
 
 		return image
-	'''
-	def _zoomin(self, image):
-		rows, cols = image.shape[:2]
-		image = cv2.resize(image, (int(rows*1.2),int(cols*1.2)))
-		image = image[int(rows*1.2/2)-int(rows/2):int(rows*1.2/2)+int(rows/2+1),
-		      int(rows*1.2/2)-int(cols/2):int(rows*1.2/2)+int(cols/2+1)]
-		image = cv2.resize(image, (rows,cols))
-		return image
-
-	def _zoomout(self, image):
-		rows, cols, ch = image.shape[:3]
-		imagezero = np.zeros( (rows, cols, ch) ,dtype=np.uint8)
-		image = cv2.resize(image, (int(rows*0.8),int(cols*0.8)))
-		imagezero[int(rows/2)-int(len(image[0])/2):int(rows/2)+int(len(image[0])/2),
-		  int(cols/2)-int(len(image[1])/2):int(cols/2)+int(len(image[1])/2)] = image
-		imagezero = cv2.resize(imagezero, (rows,cols))
-		return imagezero
-	'''
-
 
 	def _zoomIn(self, inputImage_):
 		scale = 1.2
