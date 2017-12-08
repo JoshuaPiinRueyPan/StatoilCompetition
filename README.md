@@ -15,7 +15,10 @@ This package provide some basic utilities (such as data loading, data drawing, s
 
 
 ## Setup
-1. At the first time, you should copy settings/\*.example to settings/\*.py as follows:
+1. Download the training set & test set from [Kaggle website](https://www.kaggle.com/c/statoil-iceberg-classifier-challenge/data).
+	Note: You should register the Kaggle as well as join this competition to download the data sets.
+
+2. At the first time, you should copy settings/\*.example to settings/\*.py as follows:
 	```Shell
 	$ cp settings/DataAugmentSettings.example  settings/DataAugmentSettings.py
 	$ cp settings/LayerSettings.example  settings/LayerSettings.py
@@ -31,6 +34,14 @@ Note: This framework is still under development.  If you get error such as:
 		AttributeError: 'module' object has no attribute '\*\*\*'
 	```
 after you update the project from server, it probabily means we add new settings in settings/*.py.  In this case, you can repeat the procedures listes above (i.e. copy settings/*.example  to  settings/*.py).
+
+3. We assume you put the data sets in data/ and the models in temp/models.  You can edit the settings/ to change the default directory.  For example, if you put the train.json in myDir, you can edit the TrainingSettings.py as:
+	```Shell
+		TRAINING_SET_PATH_NAME = "myDir/train.json"
+	```
+so that the program can find your training data.
+
+4. Please refer to settings/*.py to see what else can be customized.
 
 
 ## How to Customize Subnet
