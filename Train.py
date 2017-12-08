@@ -40,7 +40,7 @@ class Solver:
 				self.trainIceNet(sess, batch_x, batch_x_angle, batch_y)
 				self.updateIceNet(sess, batch_x, batch_x_angle, batch_y)
 
-				if self.dataManager.isNewEpoch:
+				if (self.dataManager.isNewEpoch)or(self.dataManager.step == 1):
 					print("Epoch: " + str(self.dataManager.epoch)+" ======================================")
 					self.calculateTrainingLoss(sess, batch_x, batch_x_angle, batch_y)
 					if trainSettings.DOES_CALCULATE_VALIDATION_SET_AT_ONCE:

@@ -7,7 +7,7 @@ class TrainingDataManager:
 		self.isNewEpoch = True
 		self.epoch = 0
 		self.cursor = 0
-		self.step = 1
+		self.step = 0
 		dataReader = StatoilDataReader()
 		self.listOfRadarImages = dataReader.Read(DATA_SET_FILE_PATH_)
 		shuffle(self.listOfRadarImages)
@@ -36,12 +36,12 @@ class TrainingDataManager:
 					arrayOfLabels[outputIndex, :] = np.array([1., 0.])
 			outputIndex += 1
 			self.cursor += 1
-			self.step += 1
 			if self.cursor >= len(self.listOfTrainingData):
 				shuffle(self.listOfTrainingData)
 				self.cursor = 0
 				self.epoch += 1
 				self.isNewEpoch = True
+		self.step += 1
 
 		return arrayOfImages, arrayOfAngles, arrayOfLabels
 
