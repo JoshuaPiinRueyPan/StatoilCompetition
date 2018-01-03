@@ -13,7 +13,7 @@ class ResnetFat(SubnetBase):
 		self.groundTruth = groundTruth_
 
 	def Build(self):
-		with tf.variable_scope("Layer1"):
+		with tf.name_scope("Layer1"):
 			'''
 			    Conv1st (5x5, 16) is the best result.
 			    (5x5, 8) is also good.

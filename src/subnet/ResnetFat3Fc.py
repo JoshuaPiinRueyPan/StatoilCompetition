@@ -14,7 +14,7 @@ class ResnetFat3Fc(SubnetBase):
 		self.dropoutValue = 0.5
 
 	def Build(self):
-		with tf.variable_scope("Layer1"):
+		with tf.name_scope("Layer1"):
 			net = ConvLayer(self.inputImage, filterSize_=5, numberOfFilters_=16,
 					stride_=1, padding_='SAME', layerName_='conv1')
 			net, updateOp1 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
