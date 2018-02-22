@@ -6,6 +6,7 @@ import src.RadarImage
 from src.DataManager import TrainingDataManager
 from src.IceNet import *
 import settings.TrainingSettings as trainSettings
+import src.layers.LayerHelper as LayerHelper
 
 class Solver:
 	def __init__(self):
@@ -33,7 +34,7 @@ class Solver:
 		with tf.Session() as sess:
 			sess.run(init)
 			self.validaSumWriter.add_graph(sess.graph)
-			self.loadPretrainModelIfUserRequired(sess)
+			self.recoverFromPretrainModelIfRequired(sess)
 
 			while self.dataManager.epoch < trainSettings.MAX_TRAINING_EPOCH:
 				batch_x, batch_x_angle, batch_y = self.dataManager.GetTrainingBatch(trainSettings.BATCH_SIZE)
@@ -49,17 +50,27 @@ class Solver:
 						self.calculateValidationLossOneByOne(sess, batch_x, batch_x_angle, batch_y)
 
 					if self.dataManager.epoch >= trainSettings.EPOCHS_TO_START_SAVE_MODEL:
-						pathToSaveCheckpoint = os.path.join(trainSettings.PATH_TO_SAVE_MODEL, 
-										     "save_epoch_" + str(self.dataManager.epoch),
-										     "icenet.ckpt")
-						self.saver.save(sess,  pathToSaveCheckpoint)
+						self.saveCheckpoint(sess)
 			print("Optimization finished!")
 
-	def loadPretrainModelIfUserRequired(self, session):
+	def recoverFromPretrainModelIfRequired(self, session):
 		if trainSettings.PRETRAIN_MODEL_PATH_NAME != "":
-			modelLoader = tf.train.Saver()
 			print("Load Pretrain model from: " + trainSettings.PRETRAIN_MODEL_PATH_NAME)
-			modelLoader.restore(session, trainSettings.PRETRAIN_MODEL_PATH_NAME)
+			CHECKPOINT_PATH_FILE_NAME, CHECKPOINT_FILE_TYPE = os.path.splitext(trainSettings.PRETRAIN_MODEL_PATH_NAME)
+			if CHECKPOINT_FILE_TYPE == ".npy":
+				# This has been done in the initialization of IceNet()
+				pass
+
+			elif CHECKPOINT_FILE_TYPE == ".ckpt":
+				print("\t Load from ckpt file.")
+				modelLoader = tf.train.Saver()
+				modelLoader.restore(session, trainSettings.PRETRAIN_MODEL_PATH_NAME)
+
+			else:
+				raise ValueError("Unkown checkpoint type: " + trainSettings.PRETRAIN_MODEL_PATH_NAME + "\n" \
+						 + "\t example: PRETRAIN_MODEL_PATH_NAME = 'temp/VGG16/save_epoch_53/icenet.ckpt'\n" \
+						 + "\t example: PRETRAIN_MODEL_PATH_NAME = 'temp/VGG16/save_epoch_53/icenet.npy'\n")
+
 		else:
 			print("Initialize model parameters by random")
 			pass
@@ -149,6 +160,18 @@ class Solver:
 		self.validaSumWriter.add_summary(summary, self.dataManager.epoch)
 		print("    validation:")
 		print("        loss: " + str(meanLoss) + ", accuracy: " + str(meanAccu) + "\n")
+
+	def saveCheckpoint(self, tf_session):
+		CHECKPOINT_FILE_NAME, CHECKPOINT_FILE_TYPE = os.path.splitext(trainSettings.PRETRAIN_MODEL_PATH_NAME)
+		pathToSaveCheckpoint = os.path.join(trainSettings.PATH_TO_SAVE_MODEL, "save_epoch_" + str(self.dataManager.epoch) )
+		if not os.path.exists(pathToSaveCheckpoint):
+			os.mkdir(pathToSaveCheckpoint)
+		if trainSettings.DOES_SAVE_MODEL_AS_NPY_FORMAT:
+			checkpointPathFileName = os.path.join(pathToSaveCheckpoint, "IceNet.npy")
+			LayerHelper.variableManager.SaveAllNetworkVariables(tf_session, checkpointPathFileName)
+
+		checkpointPathFileName = os.path.join(pathToSaveCheckpoint, "IceNet.ckpt")
+		self.saver.save(tf_session, checkpointPathFileName)
 
 
 

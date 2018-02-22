@@ -1,10 +1,10 @@
 import tensorflow as tf
-from src.layers.LayerHelper import *
+import src.layers.LayerHelper as LayerHelper
 import settings.LayerSettings as layerSettings
 
-def ConvLayer(inputTensor_, filterSize_, numberOfFilters_, stride_=1, padding_='SAME', layerName_=None):
+def ConvLayer(inputTensor_, filterSize_, numberOfFilters_, stride_=1, padding_='SAME', isTrainable_=True, layerName_=None):
 	inputChannels = int(inputTensor_.shape[3])
-	weights, biases = CreateConvVariables(filterSize_, inputChannels, numberOfFilters_, layerName_)
+	weights, biases = LayerHelper.CreateConvVariables(filterSize_, inputChannels, numberOfFilters_, isTrainable_, layerName_)
 	convTensor = tf.nn.conv2d(inputTensor_, weights, strides=[1, stride_, stride_, 1], padding=padding_)
 	outputTensor = tf.nn.bias_add(convTensor, biases)
 
@@ -14,10 +14,10 @@ def ConvLayer(inputTensor_, filterSize_, numberOfFilters_, stride_=1, padding_='
 
 	return outputTensor
 
-def FullyConnectedLayer(inputTensor_, numberOfOutputs_, layerName_=None):
-	numberOfInputs = CountElementsInOneFeatureMap(inputTensor_)
+def FullyConnectedLayer(inputTensor_, numberOfOutputs_, isTrainable_=True, layerName_=None):
+	numberOfInputs = LayerHelper.CountElementsInOneFeatureMap(inputTensor_)
 	inputTensor_ = tf.reshape(inputTensor_, [-1, numberOfInputs])
-	weights, biases = CreateFcVariables(numberOfInputs, numberOfOutputs_, layerName_)
+	weights, biases = LayerHelper.CreateFcVariables(numberOfInputs, numberOfOutputs_, isTrainable_, layerName_)
 	fc = tf.matmul(inputTensor_, weights)
 	output = tf.nn.bias_add(fc, biases)
 
@@ -56,7 +56,7 @@ def AvgPoolLayer(x, kernelSize, layerName_=None):
 				 padding='SAME',
 				 name=layerName_)
 
-def BatchNormalization(isTraining_, currentStep_, inputTensor_, isConvLayer_=False, layerName_="BatchNorm"):
+def BatchNormalization(isTraining_, currentStep_, inputTensor_, isConvLayer_=False, isTrainable_=True, layerName_="BatchNorm"):
 	with tf.variable_scope(layerName_):
 		currentBatchMean = None
 		currentBatchVariance = None
@@ -90,8 +90,8 @@ def BatchNormalization(isTraining_, currentStep_, inputTensor_, isConvLayer_=Fal
 			X' = gamma * (X - mean)/sqrt(variance**2 + epsillon) + betta
 		'''
 		outputChannels = int(inputTensor_.shape[-1])
-		gamma = tf.Variable( tf.ones([outputChannels]) )
-		betta = tf.Variable( tf.zeros([outputChannels]) )
+		gamma = LayerHelper.variableManager.LoadOrCreateVariable( tf.ones([outputChannels]), isTrainable_, layerName_+"_gamma" )
+		betta = LayerHelper.variableManager.LoadOrCreateVariable( tf.zeros([outputChannels]), isTrainable_, layerName_+"_betta" )
 		epsilon = 1e-5
 		outputTensor = tf.nn.batch_normalization(inputTensor_, mean=totalMean, variance=totalVariance, offset=betta,
 							 scale=gamma, variance_epsilon=epsilon)
