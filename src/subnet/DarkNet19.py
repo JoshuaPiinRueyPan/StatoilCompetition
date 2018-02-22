@@ -89,11 +89,9 @@ class DarkNet19(SubnetBase):
 		'''
 
 		print("last.shape() = " + str(net.get_shape()) )
-		net = tf.reshape(net, shape=[-1, 304, 304, 2])
-		net = AvgPoolLayer(net, kernelSize=304, layerName_='poolFinal')
-		print("after pooled, shape() = " + str(net.get_shape()) )
-		#net = MaxPoolLayer(net, kernelSize=75, layerName_='poolFinal')
-		output = tf.reshape(net, shape=[-1, 2])
+		net = AvgPoolLayer(net, kernelSize=37, stride=1, layerName_='poolFinal')
+		print("after AvgPool, shape() = " + str(net.get_shape()))
+		output = FullyConnectedLayer(net, numberOfOutputs_=outSettings.NUMBER_OF_CATEGORIES)
 
 		updateVariablesOperations = tf.group(updateVariablesOp1, updateVariablesOp2, updateVariablesOp3,
 						     updateVariablesOp4, updateVariablesOp5 )

@@ -45,15 +45,15 @@ def SetActivation(inputTensor_, activationType_):
 def AlexNorm(inputTensor, lsize=4, layerName_=None):
 	return tf.nn.lrn(inputTensor, lsize, bias=1.0, alpha=0.001/9.0, beta=0.75, name=layerName_)
 
-def MaxPoolLayer(x, kernelSize=2, layerName_=None):
+def MaxPoolLayer(x, kernelSize=2, stride=2, layerName_=None):
 	return tf.nn.max_pool(x, ksize=[1, kernelSize, kernelSize, 1],
-				 strides=[1, kernelSize, kernelSize, 1], padding='SAME', name=layerName_)
+				 strides=[1, stride, stride, 1], padding='VALID', name=layerName_)
 
 
-def AvgPoolLayer(x, kernelSize, layerName_=None):
+def AvgPoolLayer(x, kernelSize=2, stride=2, layerName_=None):
 	return tf.nn.avg_pool(x, ksize=[1, kernelSize, kernelSize, 1],
-				 strides=[1, kernelSize, kernelSize, 1],
-				 padding='SAME',
+				 strides=[1, stride, stride, 1],
+				 padding='VALID',
 				 name=layerName_)
 
 def BatchNormalization(isTraining_, currentStep_, inputTensor_, isConvLayer_=False, isTrainable_=True, layerName_="BatchNorm"):
