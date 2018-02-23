@@ -82,36 +82,29 @@ variableManager = VariablesManager()
 def CreateConvVariables(filterSize_, inputChannels, numberOfFilters_, isTrainable_, layerName_):
 	weightsValue = tf.truncated_normal([filterSize_, filterSize_, inputChannels, numberOfFilters_],
 					   mean=layerSettings.CONV_WEIGHTS_RNDOM_MEAN,
-					   stddev=layerSettings.CONV_WEIGHTS_RNDOM_DEVIATION)
+					   stddev=layerSettings.CONV_WEIGHTS_RNDOM_DEVIATION,
+					   name=layerName_+"/createWeightsValues")
 	biasesValue = tf.truncated_normal([numberOfFilters_],
 					  mean=layerSettings.CONV_BIASES_RNDOM_MEAN,
-					  stddev=layerSettings.CONV_BIASES_RNDOM_DEVIATION)
-	if layerName_ is None:
-		weights = variableManager.LoadOrCreateVariable(weightsValue, isTrainable_, layerName_)
-		biases = variableManager.LoadOrCreateVariable(biasesValue, isTrainable_, layerName_)
-		return weights, biases
-
-	else:
-		weights = variableManager.LoadOrCreateVariable(weightsValue, isTrainable_, layerName_ + "_weightings")
-		biases = variableManager.LoadOrCreateVariable(biasesValue, isTrainable_, layerName_ + "_biases")
-		return weights, biases
+					  stddev=layerSettings.CONV_BIASES_RNDOM_DEVIATION,
+					  name=layerName_+"/createBiasesValues")
+	weights = variableManager.LoadOrCreateVariable(weightsValue, isTrainable_, layerName_+"/weightsTensor")
+	biases = variableManager.LoadOrCreateVariable(biasesValue, isTrainable_, layerName_+"/biasesTensor")
+	return weights, biases
 
 
 def CreateFcVariables(numberOfInputs_, numberOfOutputs_, isTrainable_, layerName_):
 	weightsValue = tf.truncated_normal([numberOfInputs_, numberOfOutputs_],
 					   mean=layerSettings.FC_WEIGHTS_RANDOM_MEAN,
-					   stddev=layerSettings.FC_WEIGHTS_RANDOM_DEVIATION)
+					   stddev=layerSettings.FC_WEIGHTS_RANDOM_DEVIATION,
+					   name=layerName_+"/createWeightsValues")
 	biasesValue = tf.truncated_normal([numberOfOutputs_],
 					  mean=layerSettings.FC_BIASES_RANDOM_MEAN,
-					  stddev=layerSettings.FC_BIASES_RANDOM_DEVIATION)
-	if layerName_ is None:
-		weights = variableManager.LoadOrCreateVariable(weightsValue, isTrainable_, layerName_)
-		biases = variableManager.LoadOrCreateVariable(biasesValue, isTrainable_, layerName_)
-		return weights, biases
-	else:
-		weights = variableManager.LoadOrCreateVariable(weightsValue, isTrainable_, layerName_ + "_weightings")
-		biases = variableManager.LoadOrCreateVariable(biasesValue, isTrainable_, layerName_ + "_biases")
-		return weights, biases
+					  stddev=layerSettings.FC_BIASES_RANDOM_DEVIATION,
+					  name=layerName_+"/createBiasesValues")
+	weights = variableManager.LoadOrCreateVariable(weightsValue, isTrainable_, layerName_ + "/weightsTensor")
+	biases = variableManager.LoadOrCreateVariable(biasesValue, isTrainable_, layerName_ + "/biasesTensor")
+	return weights, biases
 
 
 def CountElementsInOneFeatureMap(inputTensor_):

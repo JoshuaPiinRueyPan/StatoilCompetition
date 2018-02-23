@@ -26,15 +26,15 @@ class ResnetFatLong(SubnetBase):
 
 		net, updateOp2 = ResidualLayer(self.isTraining, self.trainingStep, net,
 						numberOfResidualBlocks_=3, listOfConvFilterSize_=[8, 8, 32],
-						activationType_="RELU", layerName_="Layer2")
+						activationType_="RELU", layerName_="ResLayer2")
 
 		net, updateOp3 = ResidualLayer(self.isTraining, self.trainingStep, net,
 						numberOfResidualBlocks_=4, listOfConvFilterSize_=[16, 16, 64],
-						activationType_="RELU", layerName_="Layer3")
+						activationType_="RELU", layerName_="ResLayer3")
 
 		net, updateOp4 = ResidualLayer(self.isTraining, self.trainingStep, net,
 						numberOfResidualBlocks_=4, listOfConvFilterSize_=[16, 16, 64],
-						activationType_="RELU", layerName_="Layer4")
+						activationType_="RELU", layerName_="ResLayer4")
 
 		'''
 		    MaxPool seems a little improve (lower the loss).

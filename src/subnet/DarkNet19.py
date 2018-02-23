@@ -3,7 +3,7 @@ from src.subnet.SubnetBase import SubnetBase
 from src.layers.BasicLayers import *
 import settings.OutputSettings as outSettings
 
-DARKNET_INPUT_SIZE = [224, 224]
+DARKNET_INPUT_SIZE = [416, 416]
 
 class DarkNet19(SubnetBase):
 	def __init__(self, isTraining_, trainingStep_, inputImage_, inputAngle_, groundTruth_):
@@ -15,6 +15,7 @@ class DarkNet19(SubnetBase):
 
 	def Build(self):
 		darknetInput = self.transformInput()
+		print("input = " + str(darknetInput.get_shape()) )
 
 		net = ConvLayer(darknetInput, 3, 32, stride_=1, padding_='SAME', layerName_='conv1')
 		net, updateVariablesOp1 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True, layerName_="BN1")
@@ -37,7 +38,6 @@ class DarkNet19(SubnetBase):
 		net = LeakyRELU(net)
 		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool2')
 
-		'''
 		net = ConvLayer(self.inputImage, 3, 256, stride_=1, padding_='SAME', layerName_='conv6')
 		net, updateVariablesOp6 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True, layerName_="BN6")
 		net = LeakyRELU(net)
@@ -86,16 +86,12 @@ class DarkNet19(SubnetBase):
 		net = ConvLayer(self.inputImage, 1, 2, stride_=1, padding_='SAME', layerName_='conv19')
 		net, updateVariablesOp19 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True, layerName_="BN19")
 		net = LeakyRELU(net)
-		'''
 
 		print("last.shape() = " + str(net.get_shape()) )
-		net = AvgPoolLayer(net, kernelSize=37, stride=1, layerName_='poolFinal')
+		net = AvgPoolLayer(net, kernelSize=75, stride=1, layerName_='poolFinal')
 		print("after AvgPool, shape() = " + str(net.get_shape()))
 		output = FullyConnectedLayer(net, numberOfOutputs_=outSettings.NUMBER_OF_CATEGORIES)
 
-		updateVariablesOperations = tf.group(updateVariablesOp1, updateVariablesOp2, updateVariablesOp3,
-						     updateVariablesOp4, updateVariablesOp5 )
-		'''
 		updateVariablesOperations = tf.group(updateVariablesOp1, updateVariablesOp2, updateVariablesOp3,
 						     updateVariablesOp4, updateVariablesOp5, updateVariablesOp6,
 						     updateVariablesOp7, updateVariablesOp8, updateVariablesOp9,
@@ -103,7 +99,6 @@ class DarkNet19(SubnetBase):
 						     updateVariablesOp13, updateVariablesOp14, updateVariablesOp15,
 						     updateVariablesOp16, updateVariablesOp17, updateVariablesOp18,
 						     updateVariablesOp19)
-		'''
 		return output, updateVariablesOperations
 
 	def transformInput(self):
