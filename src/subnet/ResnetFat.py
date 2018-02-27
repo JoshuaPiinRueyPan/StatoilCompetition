@@ -39,9 +39,12 @@ class ResnetFat(SubnetBase):
 		'''
 		    MaxPool seems a little improve (lower the loss).
 		'''
-		print("before AvgPool, shape = " + str(net.get_shape()))
-		net = AvgPoolLayer("AveragePool", net, kernelSize=38)
-		print("after AvgPool, shape = " + str(net.get_shape()))
+		print("before Pool, shape = " + str(net.get_shape()))
+		#net = AvgPoolLayer("AveragePool", net, kernelSize=38, padding_='VALID')
+		net = AvgPoolLayer("AveragePool", net, kernelSize=7, padding_='SAME')
+		#net = MaxPoolLayer("MaxPool", net, kernelSize=38, padding_='VALID')
+		#net = MaxPoolLayer("MaxPool", net, kernelSize=7, padding_='SAME')
+		print("after Pool, shape = " + str(net.get_shape()))
 
 		net = FullyConnectedLayer('Fc', net, numberOfOutputs_=outSettings.NUMBER_OF_CATEGORIES)
 

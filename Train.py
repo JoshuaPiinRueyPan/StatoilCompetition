@@ -36,22 +36,56 @@ class Solver:
 			self.validaSumWriter.add_graph(sess.graph)
 			self.recoverFromPretrainModelIfRequired(sess)
 
+
+			print("Before run Validation, Conv2/w[1, 0, 1, :] = \n")
+			result = sess.run(LayerHelper.variableManager.tempConvVariable)
+			print( str(result[1, 0, 1, :]))
+
+			print("Before run Validation, BN3/Gamma = \n")
+			result = sess.run(LayerHelper.variableManager.tempBN)
+			print( str(result))
+
+			# Calculate Validation before Training
+			print("Validation before Training  ======================================")
+			self.CalculateValidation(sess)
+
+			print("After run Validation, Conv2/w[1, 0, 1, :] = \n")
+			result = sess.run(LayerHelper.variableManager.tempConvVariable)
+			print( str(result[1, 0, 1, :]))
+
+			print("After run Validation, BN3/Gamma = \n")
+			result = sess.run(LayerHelper.variableManager.tempBN)
+			print( str(result))
+
 			while self.dataManager.epoch < trainSettings.MAX_TRAINING_EPOCH:
 				batch_x, batch_x_angle, batch_y = self.dataManager.GetTrainingBatch(trainSettings.BATCH_SIZE)
 				self.trainIceNet(sess, batch_x, batch_x_angle, batch_y)
 				self.updateIceNet(sess, batch_x, batch_x_angle, batch_y)
 
-				if (self.dataManager.isNewEpoch)or(self.dataManager.step == 1):
+				if self.dataManager.isNewEpoch:
 					print("Epoch: " + str(self.dataManager.epoch)+" ======================================")
-					self.calculateTrainingLoss(sess, batch_x, batch_x_angle, batch_y)
-					if trainSettings.DOES_CALCULATE_VALIDATION_SET_AT_ONCE:
-						self.calculateValidationLossByWholeBatch(sess, batch_x, batch_x_angle, batch_y)
-					else:
-						self.calculateValidationLossOneByOne(sess, batch_x, batch_x_angle, batch_y)
+					self.CalculateTrainingLoss(sess, batch_x, batch_x_angle, batch_y)
+					self.CalculateValidation(sess)
 
 					if self.dataManager.epoch >= trainSettings.EPOCHS_TO_START_SAVE_MODEL:
 						self.saveCheckpoint(sess)
 			print("Optimization finished!")
+
+			print("After Opt, Conv2/w[1, 0, 1, :] = \n")
+			result = sess.run(LayerHelper.variableManager.tempConvVariable)
+			print( str(result[1, 0, 1, :]))
+
+			print("After Opt, BN3/Gamma = \n")
+			result = sess.run(LayerHelper.variableManager.tempBN)
+			print( str(result))
+
+
+	def CalculateValidation(self, session):
+		if trainSettings.DOES_CALCULATE_VALIDATION_SET_AT_ONCE:
+			self.calculateValidationLossByWholeBatch(session)
+		else:
+			self.calculateValidationLossOneByOne(session)
+
 
 	def recoverFromPretrainModelIfRequired(self, session):
 		if trainSettings.PRETRAIN_MODEL_PATH_NAME != "":
@@ -99,7 +133,7 @@ class Solver:
 					self.net.groundTruth : batch_y})
 
 
-	def calculateTrainingLoss(self, session, batch_x, batch_x_angle, batch_y):
+	def CalculateTrainingLoss(self, session, batch_x, batch_x_angle, batch_y):
 		summary, lossValue, accuValue  =  session.run( [self.summaryOp,	self.lossOp, self.accuracyOp],
 								feed_dict={	self.net.isTraining : False,
 										self.net.trainingStep : self.dataManager.step,
@@ -112,7 +146,7 @@ class Solver:
 		print("        loss: " + str(lossValue) + ", accuracy: " + str(accuValue) + "\n")
 
 
-	def calculateValidationLossByWholeBatch(self, session, batch_x, batch_x_angle, batch_y):
+	def calculateValidationLossByWholeBatch(self, session):
 		summary, lossValue, accuValue  =  session.run( [self.summaryOp,	self.lossOp, self.accuracyOp],
 								feed_dict={	self.net.isTraining : False,
 										self.net.trainingStep : self.dataManager.step,
@@ -124,7 +158,7 @@ class Solver:
 		print("    validation:")
 		print("        loss: " + str(lossValue) + ", accuracy: " + str(accuValue) + "\n")
 
-	def calculateValidationLossOneByOne(self, session, batch_x, batch_x_angle, batch_y):
+	def calculateValidationLossOneByOne(self, session):
 		'''
 		    When deal with a Large Model, stuff all validation set into a batch is not possible.
 		    Therefore, following stuff each validation data at a time

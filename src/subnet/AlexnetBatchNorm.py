@@ -13,39 +13,45 @@ class AlexnetBatchNorm(SubnetBase):
 		self.dropoutValue = 0.5
 
 	def Build(self):
-		net = ConvLayer(self.inputImage, 3, 8, stride_=1, padding_='SAME', layerName_='Conv1')
-		net, updateVariablesOp1 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True, layerName_="BN1")
+		net = ConvLayer('Conv1', self.inputImage, 3, 8, stride_=1, padding_='SAME')
+		net, updateVariablesOp1 = BatchNormalization('BN1', net, isConvLayer_=True,
+							     isTraining_=self.isTraining, currentStep_=self.trainingStep)
 		net = tf.nn.relu(net)
-		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool1')
+		net = MaxPoolLayer('Pool1', net, kernelSize=2)
 
-		net = ConvLayer(net, 3, 16, stride_=1, padding_='SAME', layerName_='Conv2')
-		net, updateVariablesOp2 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True, layerName_="BN2")
+		net = ConvLayer('Conv2', net, 3, 16, stride_=1, padding_='SAME')
+		net, updateVariablesOp2 = BatchNormalization('BN2', net, isConvLayer_=True,
+							     isTraining_=self.isTraining, currentStep_=self.trainingStep)
 		net = tf.nn.relu(net)
-		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool2')
+		net = MaxPoolLayer('Pool2', net, kernelSize=2)
 
-		net = ConvLayer(net, 3, 16, stride_=1, padding_='SAME', layerName_='Conv3')
-		net, updateVariablesOp3 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True, layerName_="BN3")
+		net = ConvLayer('Conv3', net, 3, 16, stride_=1, padding_='SAME')
+		net, updateVariablesOp3 = BatchNormalization('BN3', net, isConvLayer_=True, 
+							     isTraining_=self.isTraining, currentStep_=self.trainingStep)
 		net = tf.nn.relu(net)
-		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool3')
+		net = MaxPoolLayer('Pool3', net, kernelSize=2)
 
-		net = ConvLayer(net, 3, 16, stride_=1, padding_='SAME', layerName_='Conv4')
-		net, updateVariablesOp4 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True, layerName_="BN4")
+		net = ConvLayer('Conv4', net, 3, 16, stride_=1, padding_='SAME')
+		net, updateVariablesOp4 = BatchNormalization('BN4', net, isConvLayer_=True,
+							     isTraining_=self.isTraining, currentStep_=self.trainingStep)
 		net = tf.nn.relu(net)
-		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool4')
+		net = MaxPoolLayer('Pool4', net, kernelSize=2)
 
-		net = FullyConnectedLayer(net, numberOfOutputs_=128, layerName_='Fc1')
-		net, updateVariablesOp5 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=False, layerName_="BN5")
+		net = FullyConnectedLayer('Fc1', net, numberOfOutputs_=128)
+		net, updateVariablesOp5 = BatchNormalization('BN5', net, isConvLayer_=False,
+							     isTraining_=self.isTraining, currentStep_=self.trainingStep)
 		net = tf.nn.relu(net)
 
 		net = tf.cond(self.isTraining, lambda: tf.nn.dropout(net, self.dropoutValue), lambda: net)
 
-		net = FullyConnectedLayer(net, numberOfOutputs_=128, layerName_='Fc2')
-		net, updateVariablesOp6 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=False, layerName_="BN6")
+		net = FullyConnectedLayer('Fc2', net, numberOfOutputs_=128)
+		net, updateVariablesOp6 = BatchNormalization('BN6', net, isConvLayer_=False,
+							     isTraining_=self.isTraining, currentStep_=self.trainingStep)
 		net = tf.nn.relu(net)
 
 		net = tf.cond(self.isTraining, lambda: tf.nn.dropout(net, self.dropoutValue), lambda: net)
 
-		net = FullyConnectedLayer(net, numberOfOutputs_=outSettings.NUMBER_OF_CATEGORIES, layerName_='Fc3')
+		net = FullyConnectedLayer('Fc3', net, numberOfOutputs_=outSettings.NUMBER_OF_CATEGORIES)
 
 		updateVariablesOperations = tf.group(updateVariablesOp1, updateVariablesOp2, updateVariablesOp3,
 						    updateVariablesOp4, updateVariablesOp5, updateVariablesOp6)

@@ -13,36 +13,36 @@ class AlexnetTinyWithoutAngle(SubnetBase):
 		self.dropoutValue = 0.5
 
 	def Build(self):
-		net = ConvLayer(self.inputImage, 3, 8, stride_=1, padding_='SAME', layerName_='conv1')
+		net = ConvLayer('Conv1', self.inputImage, 3, 8, stride_=1, padding_='SAME')
 		net = tf.nn.relu(net)
-		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool1')
-		net = AlexNorm(net, lsize=4, layerName_='norm1')
+		net = MaxPoolLayer('Pool1', net, kernelSize=2)
+		net = AlexNorm('Norm1', net, lsize=4)
 
-		net = ConvLayer(net, 3, 16, stride_=1, padding_='SAME', layerName_='conv2')
+		net = ConvLayer('Conv2', net, 3, 16, stride_=1, padding_='SAME')
 		net = tf.nn.relu(net)
-		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool2')
-		net = AlexNorm(net, lsize=4, layerName_='norm3')
+		net = MaxPoolLayer('Pool2', net, kernelSize=2)
+		net = AlexNorm('Norm2', net, lsize=4)
 
-		net = ConvLayer(net, 3, 16, stride_=1, padding_='SAME', layerName_='conv3')
+		net = ConvLayer('Conv3', net, 3, 16, stride_=1, padding_='SAME')
 		net = tf.nn.relu(net)
-		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool3')
-		net = AlexNorm(net, lsize=4, layerName_='norm3')
+		net = MaxPoolLayer('Pool3', net, kernelSize=2)
+		net = AlexNorm('Norm3', net, lsize=4)
 
-		net = ConvLayer(net, 3, 16, stride_=1, padding_='SAME', layerName_='conv4')
+		net = ConvLayer('Conv4', net, 3, 16, stride_=1, padding_='SAME')
 		net = tf.nn.relu(net)
-		net = MaxPoolLayer(net, kernelSize=2, layerName_='pool4')
-		net = AlexNorm(net, lsize=4, layerName_='norm4')
+		net = MaxPoolLayer('Pool4', net, kernelSize=2)
+		net = AlexNorm('Norm4', net, lsize=4)
 
-		net = FullyConnectedLayer(net, numberOfOutputs_=128)
-		net = tf.nn.relu(net)
-
-		net = tf.cond(self.isTraining, lambda: tf.nn.dropout(net, self.dropoutValue), lambda: net)
-
-		net = FullyConnectedLayer(net, numberOfOutputs_=128)
+		net = FullyConnectedLayer('Fc1', net, numberOfOutputs_=128)
 		net = tf.nn.relu(net)
 
 		net = tf.cond(self.isTraining, lambda: tf.nn.dropout(net, self.dropoutValue), lambda: net)
 
-		output = FullyConnectedLayer(net, numberOfOutputs_=outSettings.NUMBER_OF_CATEGORIES)
+		net = FullyConnectedLayer('Fc2', net, numberOfOutputs_=128)
+		net = tf.nn.relu(net)
+
+		net = tf.cond(self.isTraining, lambda: tf.nn.dropout(net, self.dropoutValue), lambda: net)
+
+		output = FullyConnectedLayer('Fc3', net, numberOfOutputs_=outSettings.NUMBER_OF_CATEGORIES)
 		return output, tf.no_op()
 
