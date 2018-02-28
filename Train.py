@@ -36,10 +36,9 @@ class Solver:
 			self.validaSumWriter.add_graph(sess.graph)
 			self.recoverFromPretrainModelIfRequired(sess)
 
-
 			# Calculate Validation before Training
 			print("Validation before Training  ======================================")
-			self.CalculateValidation(sess)
+			self.CalculateValidation(sess, shouldSaveSummary=False)
 
 			while self.dataManager.epoch < trainSettings.MAX_TRAINING_EPOCH:
 				batch_x, batch_x_angle, batch_y = self.dataManager.GetTrainingBatch(trainSettings.BATCH_SIZE)
@@ -49,45 +48,29 @@ class Solver:
 				if self.dataManager.isNewEpoch:
 					print("Epoch: " + str(self.dataManager.epoch)+" ======================================")
 					self.CalculateTrainingLoss(sess, batch_x, batch_x_angle, batch_y)
-					self.CalculateValidation(sess)
+					self.CalculateValidation(sess, shouldSaveSummary=True)
 
 					if self.dataManager.epoch >= trainSettings.EPOCHS_TO_START_SAVE_MODEL:
 						self.saveCheckpoint(sess)
 			print("Optimization finished!")
 
-	def CalculateValidation(self, session):
+	def CalculateValidation(self, session, shouldSaveSummary):
 		if trainSettings.DOES_CALCULATE_VALIDATION_SET_AT_ONCE:
-			self.calculateValidationLossByWholeBatch(session)
+			self.calculateValidationLossByWholeBatch(session, shouldSaveSummary)
 		else:
-			self.calculateValidationLossOneByOne(session)
+			self.calculateValidationLossOneByOne(session, shouldSaveSummary)
 
 
 	def recoverFromPretrainModelIfRequired(self, session):
 		if trainSettings.PRETRAIN_MODEL_PATH_NAME != "":
 			print("Load Pretrain model from: " + trainSettings.PRETRAIN_MODEL_PATH_NAME)
-			CHECKPOINT_PATH_FILE_NAME, CHECKPOINT_FILE_TYPE = os.path.splitext(trainSettings.PRETRAIN_MODEL_PATH_NAME)
-			if CHECKPOINT_FILE_TYPE == ".npy":
-				# This has been done in the initialization of IceNet()
-				pass
-
-			elif CHECKPOINT_FILE_TYPE == ".ckpt":
-				print("\t Load from ckpt file.")
-				#listOfAllVariables = tf.get_collection(tf.GraphKeys.VARIABLES)
-				listOfAllVariables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
-				variablesToBeRecovered = [ eachVariable for eachVariable in listOfAllVariables \
-							   if eachVariable.name.split('/')[0] not in \
-							   trainSettings.NAME_SCOPES_NOT_TO_RECOVER_FROM_CHECKPOINT ]
-				modelLoader = tf.train.Saver(variablesToBeRecovered)
-				modelLoader.restore(session, trainSettings.PRETRAIN_MODEL_PATH_NAME)
-
-			else:
-				raise ValueError("Unkown checkpoint type: " + trainSettings.PRETRAIN_MODEL_PATH_NAME + "\n" \
-						 + "\t example: PRETRAIN_MODEL_PATH_NAME = 'temp/VGG16/save_epoch_53/icenet.ckpt'\n" \
-						 + "\t example: PRETRAIN_MODEL_PATH_NAME = 'temp/VGG16/save_epoch_53/icenet.npy'\n")
-
-		else:
-			print("Initialize model parameters by random")
-			pass
+			#listOfAllVariables = tf.get_collection(tf.GraphKeys.VARIABLES)
+			listOfAllVariables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+			variablesToBeRecovered = [ eachVariable for eachVariable in listOfAllVariables \
+						   if eachVariable.name.split('/')[0] not in \
+						   trainSettings.NAME_SCOPES_NOT_TO_RECOVER_FROM_CHECKPOINT ]
+			modelLoader = tf.train.Saver(variablesToBeRecovered)
+			modelLoader.restore(session, trainSettings.PRETRAIN_MODEL_PATH_NAME)
 
 
 	def trainIceNet(self, session, batch_x, batch_x_angle, batch_y):
@@ -126,19 +109,19 @@ class Solver:
 		print("        loss: " + str(lossValue) + ", accuracy: " + str(accuValue) + "\n")
 
 
-	def calculateValidationLossByWholeBatch(self, session):
+	def calculateValidationLossByWholeBatch(self, session, shouldSaveSummary):
 		summary, lossValue, accuValue  =  session.run( [self.summaryOp,	self.lossOp, self.accuracyOp],
 								feed_dict={	self.net.isTraining : False,
 										self.net.trainingStep : self.dataManager.step,
 										self.net.inputImage : self.validation_x,
 										self.net.inputAngle : self.validation_x_angle,
 										self.net.groundTruth : self.validation_y})
-
-		self.validaSumWriter.add_summary(summary, self.dataManager.epoch)
+		if shouldSaveSummary:
+			self.validaSumWriter.add_summary(summary, self.dataManager.epoch)
 		print("    validation:")
 		print("        loss: " + str(lossValue) + ", accuracy: " + str(accuValue) + "\n")
 
-	def calculateValidationLossOneByOne(self, session):
+	def calculateValidationLossOneByOne(self, session, shouldSaveSummary):
 		'''
 		    When deal with a Large Model, stuff all validation set into a batch is not possible.
 		    Therefore, following stuff each validation data at a time
@@ -171,19 +154,14 @@ class Solver:
 		mergedSumOp = tf.summary.merge([lossSumOp, accuSumOp])
 
 		summary, meanLoss, meanAccu = session.run( [mergedSumOp, meanLossOp, meanAccuOp])
-		self.validaSumWriter.add_summary(summary, self.dataManager.epoch)
+
+		if shouldSaveSummary:
+			self.validaSumWriter.add_summary(summary, self.dataManager.epoch)
 		print("    validation:")
 		print("        loss: " + str(meanLoss) + ", accuracy: " + str(meanAccu) + "\n")
 
 	def saveCheckpoint(self, tf_session):
-		CHECKPOINT_FILE_NAME, CHECKPOINT_FILE_TYPE = os.path.splitext(trainSettings.PRETRAIN_MODEL_PATH_NAME)
 		pathToSaveCheckpoint = os.path.join(trainSettings.PATH_TO_SAVE_MODEL, "save_epoch_" + str(self.dataManager.epoch) )
-		if not os.path.exists(pathToSaveCheckpoint):
-			os.mkdir(pathToSaveCheckpoint)
-		if trainSettings.DOES_SAVE_MODEL_AS_NPY_FORMAT:
-			checkpointPathFileName = os.path.join(pathToSaveCheckpoint, "IceNet.npy")
-			LayerHelper.variableManager.SaveAllNetworkVariables(tf_session, checkpointPathFileName)
-
 		checkpointPathFileName = os.path.join(pathToSaveCheckpoint, "IceNet.ckpt")
 		self.saver.save(tf_session, checkpointPathFileName)
 

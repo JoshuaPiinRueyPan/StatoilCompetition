@@ -18,17 +18,21 @@ class IceNet:
 
 	def Build(self):
 		netOutput, updateSubnetOperation = self.subnet.Build()
-		self.softmax = tf.nn.softmax(netOutput)
-		loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=netOutput, labels=self.groundTruth))
+		self.softmax = tf.nn.softmax(netOutput, name="tf.nn.softmax")
+		with tf.name_scope("calculateLoss"):
+			crossEntropy = tf.nn.softmax_cross_entropy_with_logits(logits=netOutput, labels=self.groundTruth,
+										name="tf.nn.softmax_cross_entropy_with_logits")
+			loss = tf.reduce_mean(crossEntropy, name="tf.reduce_mean")
 		accuracy = self.calculateAccuracy(netOutput, self.groundTruth)
-		tf.summary.scalar('loss', loss)
-		tf.summary.scalar('accuracy', accuracy)
+		tf.summary.scalar('lossSummary', loss)
+		tf.summary.scalar('accuracySummary', accuracy)
 
 		return loss, accuracy, updateSubnetOperation
 
 	def calculateAccuracy(self, netOutput_, groundTruth_):
-		correctPredictions = tf.equal(tf.argmax(netOutput_, 1), tf.argmax(groundTruth_, 1))
-		correctPredictions = tf.reshape(correctPredictions, shape=[-1])
+		with tf.name_scope("calculateAccuracy"):
+			correctPredictions = tf.equal(tf.argmax(netOutput_, 1), tf.argmax(groundTruth_, 1), name="tf.equal")
+			correctPredictions = tf.reshape(correctPredictions, shape=[-1], name="tf.reshape")
 
-		accuracy = tf.reduce_mean(tf.cast(correctPredictions, tf.float32))
+			accuracy = tf.reduce_mean(tf.cast(correctPredictions, tf.float32), name="tf.reduce_mean")
 		return accuracy

@@ -13,18 +13,17 @@ class ResnetFat(SubnetBase):
 		self.groundTruth = groundTruth_
 
 	def Build(self):
-		# Layer 1
-		blockName = "Layer1"
-		'''
-		    Conv1st (5x5, 16) is the best result.
-		    (5x5, 8) is also good.
-		'''
-		net = ConvLayer(blockName+'/Conv1', self.inputImage, filterSize_=5, numberOfFilters_=16,
-				stride_=1, padding_='SAME')
-		net, updateOp1 = BatchNormalization(blockName+'/BN_1', net, isConvLayer_=True,
-						    isTraining_=self.isTraining, currentStep_=self.trainingStep)
-		net = LeakyRELU(blockName+'/LeakyRELU', net)
-		net = MaxPoolLayer(blockName+'/MaxPool1', net, kernelSize=2)
+		with tf.name_scope('Layer1'):
+			'''
+			    Conv1st (5x5, 16) is the best result.
+			    (5x5, 8) is also good.
+			'''
+			net = ConvLayer('Conv1', self.inputImage, filterSize_=5, numberOfFilters_=16,
+					stride_=1, padding_='SAME')
+			net, updateOp1 = BatchNormalization('BN_1', net, isConvLayer_=True,
+							    isTraining_=self.isTraining, currentStep_=self.trainingStep)
+			net = LeakyRELU('LeakyRELU', net)
+			net = MaxPoolLayer('MaxPool1', net, kernelSize=2)
 
 		# Layer 2
 		net, updateOp2 = ResidualLayer( "ResLayer2",
@@ -39,16 +38,14 @@ class ResnetFat(SubnetBase):
 		'''
 		    MaxPool seems a little improve (lower the loss).
 		'''
-		print("before Pool, shape = " + str(net.get_shape()))
 		#net = AvgPoolLayer("AveragePool", net, kernelSize=38, padding_='VALID')
 		net = AvgPoolLayer("AveragePool", net, kernelSize=7, padding_='SAME')
 		#net = MaxPoolLayer("MaxPool", net, kernelSize=38, padding_='VALID')
 		#net = MaxPoolLayer("MaxPool", net, kernelSize=7, padding_='SAME')
-		print("after Pool, shape = " + str(net.get_shape()))
 
 		net = FullyConnectedLayer('Fc', net, numberOfOutputs_=outSettings.NUMBER_OF_CATEGORIES)
 
-		updateOperations = tf.group(updateOp1, updateOp2, updateOp3)
+		updateOperations = tf.group(updateOp1, updateOp2, updateOp3, name="groupUpdateOps")
 
 		return net, updateOperations
 
