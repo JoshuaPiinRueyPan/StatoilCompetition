@@ -37,25 +37,9 @@ class Solver:
 			self.recoverFromPretrainModelIfRequired(sess)
 
 
-			print("Before run Validation, Conv2/w[1, 0, 1, :] = \n")
-			result = sess.run(LayerHelper.variableManager.tempConvVariable)
-			print( str(result[1, 0, 1, :]))
-
-			print("Before run Validation, BN3/Gamma = \n")
-			result = sess.run(LayerHelper.variableManager.tempBN)
-			print( str(result))
-
 			# Calculate Validation before Training
 			print("Validation before Training  ======================================")
 			self.CalculateValidation(sess)
-
-			print("After run Validation, Conv2/w[1, 0, 1, :] = \n")
-			result = sess.run(LayerHelper.variableManager.tempConvVariable)
-			print( str(result[1, 0, 1, :]))
-
-			print("After run Validation, BN3/Gamma = \n")
-			result = sess.run(LayerHelper.variableManager.tempBN)
-			print( str(result))
 
 			while self.dataManager.epoch < trainSettings.MAX_TRAINING_EPOCH:
 				batch_x, batch_x_angle, batch_y = self.dataManager.GetTrainingBatch(trainSettings.BATCH_SIZE)
@@ -70,15 +54,6 @@ class Solver:
 					if self.dataManager.epoch >= trainSettings.EPOCHS_TO_START_SAVE_MODEL:
 						self.saveCheckpoint(sess)
 			print("Optimization finished!")
-
-			print("After Opt, Conv2/w[1, 0, 1, :] = \n")
-			result = sess.run(LayerHelper.variableManager.tempConvVariable)
-			print( str(result[1, 0, 1, :]))
-
-			print("After Opt, BN3/Gamma = \n")
-			result = sess.run(LayerHelper.variableManager.tempBN)
-			print( str(result))
-
 
 	def CalculateValidation(self, session):
 		if trainSettings.DOES_CALCULATE_VALIDATION_SET_AT_ONCE:
@@ -97,7 +72,12 @@ class Solver:
 
 			elif CHECKPOINT_FILE_TYPE == ".ckpt":
 				print("\t Load from ckpt file.")
-				modelLoader = tf.train.Saver()
+				#listOfAllVariables = tf.get_collection(tf.GraphKeys.VARIABLES)
+				listOfAllVariables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+				variablesToBeRecovered = [ eachVariable for eachVariable in listOfAllVariables \
+							   if eachVariable.name.split('/')[0] not in \
+							   trainSettings.NAME_SCOPES_NOT_TO_RECOVER_FROM_CHECKPOINT ]
+				modelLoader = tf.train.Saver(variablesToBeRecovered)
 				modelLoader.restore(session, trainSettings.PRETRAIN_MODEL_PATH_NAME)
 
 			else:

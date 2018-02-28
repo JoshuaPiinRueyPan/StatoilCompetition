@@ -1,7 +1,7 @@
 from src.layers.BasicLayers import *
 
 
-def ResidualBlock(layerName_, inputTensor_, listOfConvFilterSize_, isTraining_, trainingStep_, activationType_="RELU"):
+def ResidualBlock(layerName_, inputTensor_, listOfConvFilterSize_, isTraining_, trainingStep_, activationType_="RELU", isTrainable_=True):
 	'''
 	    This function will create Residual Block as follows:
 	    (supposed that listOfConvFilterSize_ = [a, b, c])
@@ -23,25 +23,28 @@ def ResidualBlock(layerName_, inputTensor_, listOfConvFilterSize_, isTraining_, 
 		# Block 'Conv1x1a'
 		blockName = layerName_ + "/Conv1x1a"
 		residualOp = ConvLayer(	blockName+'/Conv_1x1', inputTensor_,
-					filterSize_=1, numberOfFilters_=listOfConvFilterSize_[0])
+					filterSize_=1, numberOfFilters_=listOfConvFilterSize_[0], isTrainable_=isTrainable_)
 		residualOp, updateVariablesOp1 = BatchNormalization(blockName+"/BN_1x1", residualOp, isConvLayer_=True,
-								    isTraining_=isTraining_, currentStep_=trainingStep_)
+								    isTraining_=isTraining_, currentStep_=trainingStep_,
+								    isTrainable_=isTrainable_)
 		residualOp = SetActivation(blockName+"/"+activationType_, residualOp, activationType_)
 
 		# Block 'Conv3x3b'
 		blockName = layerName_ + "/Conv3x3b"
 		residualOp = ConvLayer(	blockName+'/Conv3x3', residualOp,
-					filterSize_=3, numberOfFilters_=listOfConvFilterSize_[1])
+					filterSize_=3, numberOfFilters_=listOfConvFilterSize_[1], isTrainable_=isTrainable_)
 		residualOp, updateVariablesOp2 = BatchNormalization(blockName+"/BN_3x3", residualOp, isConvLayer_=True,
-								    isTraining_=isTraining_, currentStep_=trainingStep_)
+								    isTraining_=isTraining_, currentStep_=trainingStep_,
+								    isTrainable_=isTrainable_)
 		residualOp = SetActivation(blockName+"/"+activationType_, residualOp, activationType_)
 
 		# Block 'Conv1x1c'
 		blockName = layerName_ + "/Conv1x1c"
 		residualOp = ConvLayer(	blockName+'/Conv1x1', residualOp,
-					filterSize_=1, numberOfFilters_=listOfConvFilterSize_[2])
+					filterSize_=1, numberOfFilters_=listOfConvFilterSize_[2], isTrainable_=isTrainable_)
 		residualOp, updateVariablesOp3 = BatchNormalization(blockName+"/BN_1x1", residualOp, isConvLayer_=True, 
-								    isTraining_=isTraining_, currentStep_=trainingStep_)
+								    isTraining_=isTraining_, currentStep_=trainingStep_,
+								    isTrainable_=isTrainable_)
 		residualOp = SetActivation(blockName+"/"+activationType_, residualOp, activationType_)
 
 		output = tf.add(inputTensor_, residualOp, name=layerName_+"/add")
@@ -56,7 +59,8 @@ def ResidualBlock(layerName_, inputTensor_, listOfConvFilterSize_, isTraining_, 
 		raise ValueError(errorMessage)
 
 
-def ResidualHeadBlock(layerName_, inputTensor_, listOfConvFilterSize_, isTraining_, trainingStep_, activationType_="RELU"):
+def ResidualHeadBlock(layerName_, inputTensor_, listOfConvFilterSize_, isTraining_, trainingStep_,
+								 activationType_="RELU", isTrainable_=True):
 	'''
 	    This function will create Residual Head Block as follows:
 	    (supposed that listOfConvFilterSize_ = [a, b, c])
@@ -77,33 +81,37 @@ def ResidualHeadBlock(layerName_, inputTensor_, listOfConvFilterSize_, isTrainin
 		# Block 'Conv1x1a'
 		blockName = layerName_ + "/Conv1x1a"
 		residualOp = ConvLayer(	blockName+'/Conv1x1', inputTensor_,
-					 filterSize_=1,	numberOfFilters_=listOfConvFilterSize_[0])
+					 filterSize_=1,	numberOfFilters_=listOfConvFilterSize_[0], isTrainable_=isTrainable_)
 		residualOp, updateVariablesOp1 = BatchNormalization(blockName+"/BN_1x1", residualOp, isConvLayer_=True,
-								    isTraining_=isTraining_, currentStep_=trainingStep_)
+								    isTraining_=isTraining_, currentStep_=trainingStep_,
+								    isTrainable_=isTrainable_)
 		residualOp = SetActivation(blockName+"/"+activationType_, residualOp, activationType_)
 
 		# Block 'Conv3x3b'
 		blockName = layerName_ + '/Conv3x3b'
 		residualOp = ConvLayer(	blockName+'/Conv3x3', residualOp,
-					filterSize_=3,	numberOfFilters_=listOfConvFilterSize_[1])
+					filterSize_=3,	numberOfFilters_=listOfConvFilterSize_[1], isTrainable_=isTrainable_)
 		residualOp, updateVariablesOp2 = BatchNormalization(blockName+"/BN_3x3", residualOp, isConvLayer_=True,
-								    isTraining_=isTraining_, currentStep_=trainingStep_)
+								    isTraining_=isTraining_, currentStep_=trainingStep_,
+								    isTrainable_=isTrainable_)
 		residualOp = SetActivation(blockName+"/"+activationType_, residualOp, activationType_)
 
 		# Block 'Conv1x1c'
 		blockName = layerName_ + "/Conv1x1c"
 		residualOp = ConvLayer( blockName+'/Conv1x1', residualOp,
-					filterSize_=1, numberOfFilters_=listOfConvFilterSize_[2])
+					filterSize_=1, numberOfFilters_=listOfConvFilterSize_[2], isTrainable_=isTrainable_)
 		residualOp, updateVariablesOp3 = BatchNormalization(blockName+"/BN_1x1", residualOp, isConvLayer_=True,
-								    isTraining_=isTraining_, currentStep_=trainingStep_)
+								    isTraining_=isTraining_, currentStep_=trainingStep_,
+								    isTrainable_=isTrainable_)
 		residualOp = SetActivation(blockName+"/"+activationType_, residualOp, activationType_)
 
 		# Block 'Conv1x1_Identity'
 		blockName = layerName_ + '/Conv1x1_Identity'
 		identityOp = ConvLayer(	blockName+'/Conv1x1_I', inputTensor_,
-					filterSize_=1, numberOfFilters_=listOfConvFilterSize_[2])
+					filterSize_=1, numberOfFilters_=listOfConvFilterSize_[2], isTrainable_=isTrainable_)
 		identityOp, updateVariablesOp4 = BatchNormalization(blockName+"/BN_I", identityOp, isConvLayer_=True,
-								    isTraining_=isTraining_, currentStep_=trainingStep_)
+								    isTraining_=isTraining_, currentStep_=trainingStep_,
+								    isTrainable_=isTrainable_)
 		identityOp = SetActivation(blockName+"/"+activationType_, identityOp, activationType_)
 
 		output = tf.add(identityOp, residualOp, name=layerName_+"/add")
@@ -120,7 +128,7 @@ def ResidualHeadBlock(layerName_, inputTensor_, listOfConvFilterSize_, isTrainin
 
 
 def ResidualLayer(layerName_, inputTensor_, numberOfResidualBlocks_, listOfConvFilterSize_,
-		  isTraining_, trainingStep_, activationType_="RELU"):
+		  isTraining_, trainingStep_, activationType_="RELU", isTrainable_=True):
 	'''
 	    This function is the wrapper that use the above block to build the Layers in ResNet.
 	    The ResLayer has following configuration:
@@ -152,13 +160,14 @@ def ResidualLayer(layerName_, inputTensor_, numberOfResidualBlocks_, listOfConvF
 		listOfUpdateOperations = []
 		headOutput, updateHead = ResidualHeadBlock( layerName_+"/HeadBlock",
 							    inputTensor_, listOfConvFilterSize_, 
-							    isTraining_, trainingStep_, activationType_)
+							    isTraining_, trainingStep_, activationType_, isTrainable_=isTrainable_)
 		listOfUpdateOperations.append(updateHead)
 		preiousOutput = headOutput
 		for i in range(numberOfResidualBlocks_ - 1):  # The first Block is created above, thus '-1'
 			preiousOutput, currentUpdate = ResidualBlock(layerName_+"/BodyBlock"+str(i),
 								     preiousOutput, listOfConvFilterSize_,
 								     isTraining_, trainingStep_, activationType_,
+								     isTrainable_=isTrainable_
 								    )
 			listOfUpdateOperations.append(currentUpdate)
 		

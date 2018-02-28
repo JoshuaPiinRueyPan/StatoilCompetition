@@ -32,11 +32,7 @@ class VariablesManager:
 			print(variableName_ + ": key not found!")
 			variableValue = initialValue_
 
-		if isTrainable_:
-			tf_variable = tf.Variable(variableValue, dtype=tf.float32, name=variableName_)
-
-		else:
-			tf_variable = tf.constant(variableValue, dtype=tf.float32, name=variableName_)
+		tf_variable = tf.Variable(variableValue, dtype=tf.float32, name=variableName_, trainable=isTrainable_)
 
 		self._appendVariableToDictionary(variableName_, tf_variable)
 
@@ -45,40 +41,13 @@ class VariablesManager:
 					 + "\t targetVariableShape = "+str(initialValue_.get_shape()) \
 					 + ";  while actually create variable with shape = " + str(tf_variable.get_shape()) )
 
-
-		if variableName_ == 'Conv2/weightsTensor':
-			print('Conv2/w[1, 0, 1, :] = ')
-			print('\t In dictionary, = \n' + str(variableValue[1, 0, 1, :]))
-			self.tempConvVariable = tf_variable
-
-			with tf.Session() as sess:
-				sess = tf.Session()
-				init = tf.initialize_all_variables()
-				sess.run(init)
-				result = sess.run(self.tempConvVariable)
-				print("after sess.run(variable) = \n" + str(result[1, 0, 1, :]))
-			print("tempConvVariable = " + str(self.tempConvVariable))
-
-		if variableName_ == 'BN3/Gamma':
-			print('BN3/Gamma = ')
-			print('In dict = \n' + str(variableValue))
-			self.tempBN = tf_variable
-
-			with tf.Session() as sess:
-				sess = tf.Session()
-				init = tf.initialize_all_variables()
-				sess.run(init)
-				result = sess.run(self.tempBN)
-				print("after sess.run(variable) = \n" + str(result))
-			print("tempBN = " + str(self.tempBN))
-
 		return tf_variable
 
 	def _loadVariableFromCheckpoint(self, variableName_):
 		return self._dictionaryFromCheckpoint[variableName_]
 
-	def _appendVariableToDictionary(self, variableName_, variableValue_):
-		self._dictionaryInCurrentNetwork[variableName_] = variableValue_
+	def _appendVariableToDictionary(self, variableName_, tf_variable_):
+		self._dictionaryInCurrentNetwork[variableName_] = tf_variable_
 
 	def SaveAllNetworkVariables(self, tf_session, FILE_PATH_NAME_TO_SAVE_VARIABLES):
 		tempDictionary = {}
@@ -92,10 +61,6 @@ class VariablesManager:
 				tempDictionary[variableName] = variableValue
 
 		np.save(FILE_PATH_NAME_TO_SAVE_VARIABLES, tempDictionary)
-		print('Conv2/w[1, 0, 1, :] = ')
-		print('\t In tempDict, = \n' + str(tempDictionary['Conv2/weightsTensor'][1, 0, 1, :]))
-		print('BN3/Gamma = ')
-		print('\t In tempDict, = \n' + str(tempDictionary['BN3/Gamma']))
 
 
 	def __init__(self):
