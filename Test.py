@@ -10,7 +10,7 @@ import csv
 class Testing:
 	def __init__(self):
 		self.net = IceNet()
-		self.cost, self.accuracy, _ = self.net.Build()
+		_ = self.net.Build()
 		print("Loading Test Set, please wait...")
 		self.dataManager = TestingDataManager(testSettings.TESTING_SET_PATH_NAME)
 		print("Loading finished.")
@@ -27,10 +27,11 @@ class Testing:
 			sess.run(init)
 			self.saver.restore(sess, testSettings.MODEL_PATH_NAME)
 			for i in range(len(self.listOfIDs)):
-				netOutput = sess.run(self.net.softmax, feed_dict={self.net.isTraining : False,
-								    self.net.inputImage : [self.arrayOfImages[i]],
-								    self.net.inputAngle : [self.arrayOfAngles[i]]})
-				answer = testSettings.GetAnswer(netOutput)
+				prediction = sess.run(self.net.GetSoftmaxedOutput(),
+						     feed_dict={self.net.isTraining : False,
+								self.net.inputImage : [self.arrayOfImages[i]],
+								self.net.inputAngle : [self.arrayOfAngles[i]]})
+				answer = testSettings.GetAnswer(prediction)
 				answerList = [self.listOfIDs[i], answer]
 				csvWriter.writerow(answerList)
 

@@ -17,17 +17,26 @@ class Solver:
 
 		# Net
 		self.net = IceNet()
-		self.lossOp, self.accuracyOp, self.updateNetOp = self.net.Build()
+		self.updateNetOp = self.net.Build()
+		self.trainLossOp, self.trainAccuOp = self.net.GetTrainingResultTensor()
+		self.validaLossOp, self.validaAccuOp = self.net.GetValidationResultTensor()
 
 		# Optimizer
 		self.learningRate = tf.placeholder(tf.float32, shape=[])
-		self.optimizer = tf.train.AdamOptimizer(learning_rate=self.learningRate).minimize(self.lossOp)
+		try:
+			# If there's other losses (e.g. Regularization Loss)
+			otherLossOp = tf.losses.get_total_loss(add_regularization_losses=True)
+			totalLossOp = self.trainLossOp + otherLossOp
+		except:
+			# If there's no other loss op
+			totalLossOp = self.trainLossOp
+		self.optimzeOp = tf.train.AdamOptimizer(learning_rate=self.learningRate).minimize(totalLossOp)
 
 		# Summary
-		self.summaryOp = tf.summary.merge_all()
 		self.trainSumWriter = tf.summary.FileWriter(trainSettings.PATH_TO_SAVE_MODEL+"/train")
 		self.validaSumWriter = tf.summary.FileWriter(trainSettings.PATH_TO_SAVE_MODEL+"/valid")
 		self.saver = tf.train.Saver(max_to_keep=trainSettings.MAX_TRAINING_SAVE_MODEL)
+		self.summaryOp = tf.summary.merge_all()
 
 	def Run(self):
 		init = tf.initialize_all_variables()
@@ -54,17 +63,10 @@ class Solver:
 						self.saveCheckpoint(sess)
 			print("Optimization finished!")
 
-	def CalculateValidation(self, session, shouldSaveSummary):
-		if trainSettings.DOES_CALCULATE_VALIDATION_SET_AT_ONCE:
-			self.calculateValidationLossByWholeBatch(session, shouldSaveSummary)
-		else:
-			self.calculateValidationLossOneByOne(session, shouldSaveSummary)
-
 
 	def recoverFromPretrainModelIfRequired(self, session):
 		if trainSettings.PRETRAIN_MODEL_PATH_NAME != "":
 			print("Load Pretrain model from: " + trainSettings.PRETRAIN_MODEL_PATH_NAME)
-			#listOfAllVariables = tf.get_collection(tf.GraphKeys.VARIABLES)
 			listOfAllVariables = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
 			variablesToBeRecovered = [ eachVariable for eachVariable in listOfAllVariables \
 						   if eachVariable.name.split('/')[0] not in \
@@ -75,7 +77,7 @@ class Solver:
 
 	def trainIceNet(self, session, batch_x, batch_x_angle, batch_y):
 		currentLearningRate = trainSettings.GetLearningRate(self.dataManager.epoch)
-		session.run( self.optimizer,
+		session.run( self.optimzeOp,
 			     feed_dict={self.net.isTraining : True,
 					self.net.trainingStep : self.dataManager.step,
 					self.net.inputImage : batch_x,
@@ -97,7 +99,7 @@ class Solver:
 
 
 	def CalculateTrainingLoss(self, session, batch_x, batch_x_angle, batch_y):
-		summary, lossValue, accuValue  =  session.run( [self.summaryOp,	self.lossOp, self.accuracyOp],
+		summary, lossValue, accuValue  =  session.run( [self.summaryOp, self.trainLossOp, self.trainAccuOp],
 								feed_dict={	self.net.isTraining : False,
 										self.net.trainingStep : self.dataManager.step,
 										self.net.inputImage : batch_x,
@@ -109,8 +111,8 @@ class Solver:
 		print("        loss: " + str(lossValue) + ", accuracy: " + str(accuValue) + "\n")
 
 
-	def calculateValidationLossByWholeBatch(self, session, shouldSaveSummary):
-		summary, lossValue, accuValue  =  session.run( [self.summaryOp,	self.lossOp, self.accuracyOp],
+	def CalculateValidation(self, session, shouldSaveSummary):
+		summary, lossValue, accuValue  =  session.run( [self.summaryOp, self.validaLossOp, self.validaAccuOp],
 								feed_dict={	self.net.isTraining : False,
 										self.net.trainingStep : self.dataManager.step,
 										self.net.inputImage : self.validation_x,
@@ -120,45 +122,6 @@ class Solver:
 			self.validaSumWriter.add_summary(summary, self.dataManager.epoch)
 		print("    validation:")
 		print("        loss: " + str(lossValue) + ", accuracy: " + str(accuValue) + "\n")
-
-	def calculateValidationLossOneByOne(self, session, shouldSaveSummary):
-		'''
-		    When deal with a Large Model, stuff all validation set into a batch is not possible.
-		    Therefore, following stuff each validation data at a time
-		'''
-		arrayOfValidaLoss = np.zeros( (self.NUMBER_OF_VALIDATION_DATA) )
-		arrayOfValidaAccu = np.zeros( (self.NUMBER_OF_VALIDATION_DATA) )
-		for i in range(self.NUMBER_OF_VALIDATION_DATA):
-			validaImage = self.validation_x[i]
-			validaImage = np.reshape(validaImage, [1, RadarImage.DATA_WIDTH, RadarImage.DATA_HEIGHT, RadarImage.DATA_CHANNELS])
-
-			validaAngle = self.validation_x_angle[i]
-			validaAngle = np.reshape(validaAngle, [1, 1])
-
-			validaLabel = self.validation_y[i]
-			validaLabel = np.reshape(validaLabel, [1, 2])
-			lossValue, accuValue  =  session.run( [	self.lossOp, self.accuracyOp],
-								feed_dict={	self.net.isTraining : False,
-										self.net.trainingStep : self.dataManager.step,
-										self.net.inputImage : validaImage,
-										self.net.inputAngle : validaAngle,
-										self.net.groundTruth : validaLabel})
-			arrayOfValidaLoss[i] = lossValue
-			arrayOfValidaAccu[i] = accuValue
-
-		meanLossOp = tf.reduce_mean(arrayOfValidaLoss)
-		meanAccuOp = tf.reduce_mean(arrayOfValidaAccu)
-
-		lossSumOp = tf.summary.scalar('loss', meanLossOp)
-		accuSumOp = tf.summary.scalar('accuracy', meanAccuOp)
-		mergedSumOp = tf.summary.merge([lossSumOp, accuSumOp])
-
-		summary, meanLoss, meanAccu = session.run( [mergedSumOp, meanLossOp, meanAccuOp])
-
-		if shouldSaveSummary:
-			self.validaSumWriter.add_summary(summary, self.dataManager.epoch)
-		print("    validation:")
-		print("        loss: " + str(meanLoss) + ", accuracy: " + str(meanAccu) + "\n")
 
 	def saveCheckpoint(self, tf_session):
 		pathToSaveCheckpoint = os.path.join(trainSettings.PATH_TO_SAVE_MODEL, "save_epoch_" + str(self.dataManager.epoch) )

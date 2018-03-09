@@ -23,12 +23,12 @@ class AlexnetTinyWithoutAngle(SubnetBase):
 		net = MaxPoolLayer('Pool2', net, kernelSize=2)
 		net = AlexNorm('Norm2', net, lsize=4)
 
-		net = ConvLayer('Conv3', net, 3, 16, stride_=1, padding_='SAME')
+		net = ConvLayer('Conv3', net, 3, 32, stride_=1, padding_='SAME')
 		net = tf.nn.relu(net)
 		net = MaxPoolLayer('Pool3', net, kernelSize=2)
 		net = AlexNorm('Norm3', net, lsize=4)
 
-		net = ConvLayer('Conv4', net, 3, 16, stride_=1, padding_='SAME')
+		net = ConvLayer('Conv4', net, 3, 32, stride_=1, padding_='SAME')
 		net = tf.nn.relu(net)
 		net = MaxPoolLayer('Pool4', net, kernelSize=2)
 		net = AlexNorm('Norm4', net, lsize=4)
