@@ -11,8 +11,9 @@ def ConvLayer(layerName_, inputTensor_, filterSize_, numberOfFilters_, stride_=1
 					  padding=padding_, name="tf.nn.conv2d")
 		outputTensor = tf.nn.bias_add(convTensor, biases, name="tf.nn.bias_add")
 
-		tf.summary.histogram('weightsSummary', weights)
-		tf.summary.histogram('biasesSummary', biases)
+		if layerSettings.DOES_SHOW_CONV_SUMMARY:
+			tf.summary.histogram('weightsSummary', weights)
+			tf.summary.histogram('biasesSummary', biases)
 
 		return outputTensor
 
@@ -24,8 +25,9 @@ def FullyConnectedLayer(layerName_, inputTensor_, numberOfOutputs_, isTrainable_
 		fc = tf.matmul(inputTensor_, weights, name="tf.matmul")
 		output = tf.nn.bias_add(fc, biases, name="tf.nn.bias_add")
 
-		tf.summary.histogram('weightsSummary', weights)
-		tf.summary.histogram('biasesSummary', biases)
+		if layerSettings.DOES_SHOW_FC_SUMMARY:
+			tf.summary.histogram('weightsSummary', weights)
+			tf.summary.histogram('biasesSummary', biases)
 
 		return output
 
@@ -47,14 +49,14 @@ def SetActivation(layerName_, inputTensor_, activationType_):
 def AlexNorm(layerName_, inputTensor, lsize=4):
 	return tf.nn.lrn(inputTensor, lsize, bias=1.0, alpha=0.001/9.0, beta=0.75, name=layerName_)
 
-def MaxPoolLayer(layerName_, inputTensor_, kernelSize=2, stride=2, padding_='SAME'):
-	return tf.nn.max_pool(inputTensor_, ksize=[1, kernelSize, kernelSize, 1],
-				 strides=[1, stride, stride, 1], padding=padding_, name=layerName_)
+def MaxPoolLayer(layerName_, inputTensor_, kernelSize_=2, stride_=2, padding_='SAME'):
+	return tf.nn.max_pool(inputTensor_, ksize=[1, kernelSize_, kernelSize_, 1],
+				 strides=[1, stride_, stride_, 1], padding=padding_, name=layerName_)
 
 
-def AvgPoolLayer(layerName_, inputTensor_, kernelSize=2, stride=2, padding_='SAME'):
-	return tf.nn.avg_pool(inputTensor_, ksize=[1, kernelSize, kernelSize, 1],
-				 strides=[1, stride, stride, 1],
+def AvgPoolLayer(layerName_, inputTensor_, kernelSize_=2, stride_=2, padding_='SAME'):
+	return tf.nn.avg_pool(inputTensor_, ksize=[1, kernelSize_, kernelSize_, 1],
+				 strides=[1, stride_, stride_, 1],
 				 padding=padding_,
 				 name=layerName_)
 
@@ -94,8 +96,8 @@ def BatchNormalization(layerName_, inputTensor_, isConvLayer_, isTraining_, curr
 			X' = gamma * (X - mean)/sqrt(variance**2 + epsillon) + betta
 		'''
 		outputChannels = int(inputTensor_.shape[-1])
-		gamma = LayerHelper.Create_tfVariable("Gamma", tf.ones([outputChannels]), isTrainable_)
-		betta = LayerHelper.Create_tfVariable("Betta", tf.zeros([outputChannels]), isTrainable_)
+		gamma = LayerHelper.Create_tfVariable("Gamma", tf.ones([outputChannels]), isTrainable_, doesRegularize_=False)
+		betta = LayerHelper.Create_tfVariable("Betta", tf.zeros([outputChannels]), isTrainable_, doesRegularize_=False)
 		epsilon = 1e-5
 		outputTensor = tf.nn.batch_normalization(inputTensor_, mean=totalMean, variance=totalVariance, offset=betta,
 							 scale=gamma, variance_epsilon=epsilon,

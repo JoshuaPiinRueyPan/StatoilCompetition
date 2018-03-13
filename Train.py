@@ -13,7 +13,6 @@ class Solver:
 		# Data Manager
 		self.dataManager = TrainingDataManager(trainSettings.TRAINING_SET_PATH_NAME, trainSettings.VALIDATION_RATIO)
 		self.validation_x, self.validation_x_angle, self.validation_y = self.dataManager.GetValidationSet()
-		self.NUMBER_OF_VALIDATION_DATA = self.validation_x.shape[0]
 
 		# Net
 		self.net = IceNet()

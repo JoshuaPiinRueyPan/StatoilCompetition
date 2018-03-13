@@ -43,7 +43,7 @@ class IceNet:
 	def GetValidationResultTensor(self):
 		with tf.name_scope("validationResults"):
 			if trainSettings.DOES_CALCULATE_VALIDATION_SET_AT_ONCE:
-				lossOp, accuracyOp = self.GetTrainingResultTensor()
+				return  self.GetTrainingResultTensor()
 
 			else:
 				listOfSplitedInputs = tf.split( self.inputImage,

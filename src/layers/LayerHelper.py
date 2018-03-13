@@ -4,13 +4,23 @@ import settings.LayerSettings as layerSettings
 import settings.TrainingSettings as trainSettings
 import os
 
-def Create_tfVariable(variableName_, initialValue_, isTrainable_):
+def L2_Regularizer(weightsTensor_):
+	with tf.name_scope("L2_Regularizer"):
+		if layerSettings.REGULARIZER_WEIGHTS_DECAY != None:
+			weightDecay = tf.convert_to_tensor(layerSettings.REGULARIZER_WEIGHTS_DECAY,
+							   dtype=weightsTensor_.dtype.base_dtype,
+							   name='weightDecay')
+			return tf.multiply(weightDecay, tf.nn.l2_loss(weightsTensor_), name='tf.multiply')
+
+		else:
+			return None
+
+def Create_tfVariable(variableName_, initialValue_, isTrainable_, doesRegularize_=True):
 	tf_variable = tf.Variable(initialValue_, dtype=tf.float32, name=variableName_, trainable=isTrainable_)
 
-	if tf_variable.get_shape() != initialValue_.get_shape():
-		raise ValueError("In initialize variable: " + variableName_ + "\n" \
-				 + "\t targetVariableShape = "+str(initialValue_.get_shape()) \
-				 + ";  while actually create variable with shape = " + str(tf_variable.get_shape()) )
+	if (layerSettings.REGULARIZER_WEIGHTS_DECAY != None)and(doesRegularize_):
+		regularizationLoss = L2_Regularizer(tf_variable)
+		tf.losses.add_loss(regularizationLoss, loss_collection=tf.GraphKeys.REGULARIZATION_LOSSES)
 
 	return tf_variable
 
@@ -25,8 +35,8 @@ def CreateConvVariables(layerName_, filterSize_, inputChannels, numberOfFilters_
 						  mean=layerSettings.CONV_BIASES_RNDOM_MEAN,
 						  stddev=layerSettings.CONV_BIASES_RNDOM_DEVIATION,
 						  name="biasesValues")
-		weights = Create_tfVariable("weightsVariable", weightsValue, isTrainable_)
-		biases = Create_tfVariable("biasesVariable", biasesValue, isTrainable_)
+		weights = Create_tfVariable("weightsVariable", weightsValue, isTrainable_, doesRegularize_=True)
+		biases = Create_tfVariable("biasesVariable", biasesValue, isTrainable_, doesRegularize_=True)
 		return weights, biases
 
 
@@ -40,8 +50,8 @@ def CreateFcVariables(layerName_, numberOfInputs_, numberOfOutputs_, isTrainable
 						  mean=layerSettings.FC_BIASES_RANDOM_MEAN,
 						  stddev=layerSettings.FC_BIASES_RANDOM_DEVIATION,
 						  name="biasesValues")
-		weights = Create_tfVariable("weightsVariable", weightsValue, isTrainable_)
-		biases = Create_tfVariable("biasesVariable", biasesValue, isTrainable_)
+		weights = Create_tfVariable("weightsVariable", weightsValue, isTrainable_, doesRegularize_=True)
+		biases = Create_tfVariable("biasesVariable", biasesValue, isTrainable_, doesRegularize_=True)
 		return weights, biases
 
 
