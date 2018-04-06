@@ -16,7 +16,7 @@ def L2_Regularizer(weightsTensor_):
 			return None
 
 def Create_tfVariable(variableName_, initialValue_, isTrainable_, doesRegularize_=True):
-	tf_variable = tf.Variable(initialValue_, dtype=layerSettings.FLOAT_TYPE, name=variableName_, trainable=isTrainable_)
+	tf_variable = tf.Variable(initialValue_, dtype=tf.float32, name=variableName_, trainable=isTrainable_)
 
 	if (layerSettings.REGULARIZER_WEIGHTS_DECAY != None)and(doesRegularize_):
 		regularizationLoss = L2_Regularizer(tf_variable)
@@ -30,12 +30,10 @@ def CreateConvVariables(layerName_, filterSize_, inputChannels, numberOfFilters_
 		weightsValue = tf.truncated_normal([filterSize_, filterSize_, inputChannels, numberOfFilters_],
 						   mean=layerSettings.CONV_WEIGHTS_RNDOM_MEAN,
 						   stddev=layerSettings.CONV_WEIGHTS_RNDOM_DEVIATION,
-						   dtype=layerSettings.FLOAT_TYPE,
 						   name="weightsValues")
 		biasesValue = tf.truncated_normal([numberOfFilters_],
 						  mean=layerSettings.CONV_BIASES_RNDOM_MEAN,
 						  stddev=layerSettings.CONV_BIASES_RNDOM_DEVIATION,
-						  dtype=layerSettings.FLOAT_TYPE,
 						  name="biasesValues")
 		weights = Create_tfVariable("weightsVariable", weightsValue, isTrainable_, doesRegularize_=True)
 		biases = Create_tfVariable("biasesVariable", biasesValue, isTrainable_, doesRegularize_=False)
@@ -47,12 +45,10 @@ def CreateFcVariables(layerName_, numberOfInputs_, numberOfOutputs_, isTrainable
 		weightsValue = tf.truncated_normal([numberOfInputs_, numberOfOutputs_],
 						   mean=layerSettings.FC_WEIGHTS_RANDOM_MEAN,
 						   stddev=layerSettings.FC_WEIGHTS_RANDOM_DEVIATION,
-						   dtype=layerSettings.FLOAT_TYPE,
 						   name="weightsValues")
 		biasesValue = tf.truncated_normal([numberOfOutputs_],
 						  mean=layerSettings.FC_BIASES_RANDOM_MEAN,
 						  stddev=layerSettings.FC_BIASES_RANDOM_DEVIATION,
-						  dtype=layerSettings.FLOAT_TYPE,
 						  name="biasesValues")
 		weights = Create_tfVariable("weightsVariable", weightsValue, isTrainable_, doesRegularize_=True)
 		biases = Create_tfVariable("biasesVariable", biasesValue, isTrainable_, doesRegularize_=False)

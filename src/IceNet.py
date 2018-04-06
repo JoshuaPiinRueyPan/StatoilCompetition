@@ -2,7 +2,7 @@ import tensorflow as tf
 import src.RadarImage as RadarImage
 import settings.OutputSettings as outSettings
 from settings.SubnetSettings import SubnetFactory
-import settings.TrainingSettings as trainSettings
+import settings.TrainSettings as trainSettings
 
 class IceNet:
 	def __init__(self):

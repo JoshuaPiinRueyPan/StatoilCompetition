@@ -6,7 +6,7 @@ import settings.LayerSettings as layerSettings
 
 slim = tf.contrib.slim
 
-class AlexBatchNormRegularization(SubnetBase):
+class slim_AlexBN(SubnetBase):
 	def __init__(self, isTraining_, trainingStep_, inputImage_, inputAngle_, groundTruth_):
 		self.isTraining = isTraining_
 		self.trainingStep = trainingStep_

@@ -2,7 +2,6 @@ import numpy as np
 import tensorflow as tf
 
 from src.subnet.SubnetBase import SubnetBase
-import settings.TrainingSettings as trainSettings
 
 VGG_MODEL_PATH = "data/VGG/vgg16.npy"
 

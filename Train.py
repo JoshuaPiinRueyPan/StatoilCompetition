@@ -5,7 +5,7 @@ import numpy as np
 import src.RadarImage
 from src.DataManager import TrainingDataManager
 from src.IceNet import *
-import settings.TrainingSettings as trainSettings
+import settings.TrainSettings as trainSettings
 import src.layers.LayerHelper as LayerHelper
 
 class Solver:

@@ -1,21 +1,27 @@
-TRAINING_SET_PATH_NAME = "data/train.json"
 PRETRAIN_MODEL_PATH_NAME = ""
-VALIDATION_RATIO = 0.1
+#PRETRAIN_MODEL_PATH_NAME = "temp/models/testVali/save_epoch_25/IceNet.ckpt"
+NAME_SCOPES_NOT_TO_RECOVER_FROM_CHECKPOINT = []
+#NAME_SCOPES_NOT_TO_RECOVER_FROM_CHECKPOINT = ['ResLayer4', 'ResLayer5']
 
+TRAINING_SET_PATH_NAME = "data/train.json"
+VALIDATION_RATIO = 0.1
+NUMBER_OF_VALIDATION_DATA = 160
 BATCH_SIZE = 100
 
-MAX_TRAINING_EPOCH = 250
+MAX_TRAINING_EPOCH = 100
 
 EPOCHS_TO_START_SAVE_MODEL = 20
-PATH_TO_SAVE_MODEL = "temp/model/Alexnet"
+PATH_TO_SAVE_MODEL = "temp/models/DarkNet19"
 MAX_TRAINING_SAVE_MODEL = MAX_TRAINING_EPOCH
 
 '''
     Following can be used to customize learning rate,
     you can either use tf.train.exponetial_decay().
 '''
-LIST_OF_EPOCH_LEARNING_RATE_PAIRS = [ (0, 1e-4) ]
-#LIST_OF_EPOCH_LEARNING_RATE_PAIRS = [ (0, 1e-3), (30, 1e-4), (300, 1e-5) ]
+#LIST_OF_EPOCH_LEARNING_RATE_PAIRS = [ (0, 1e-5) ]
+#LIST_OF_EPOCH_LEARNING_RATE_PAIRS = [ (0, 1e-3), (50, 1e-4) ]
+LIST_OF_EPOCH_LEARNING_RATE_PAIRS = [ (0, 1e-4), (70, 1e-5) ]
+#LIST_OF_EPOCH_LEARNING_RATE_PAIRS = [ (0, 1e-4), (30, 1e-5), (100, 1e-6) ]
 def GetLearningRate(currentEpoch_):
 	for eachPair in reversed(LIST_OF_EPOCH_LEARNING_RATE_PAIRS):
 		if currentEpoch_ >= eachPair[0]:
