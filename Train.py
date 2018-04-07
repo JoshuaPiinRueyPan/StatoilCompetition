@@ -150,7 +150,8 @@ class Solver:
 		arrayOfValidaAccu = np.zeros( (trainSettings.NUMBER_OF_VALIDATION_DATA) )
 		for i in range(trainSettings.NUMBER_OF_VALIDATION_DATA):
 			validaImage = self.validation_x[i]
-			validaImage = np.reshape(validaImage, [1, RadarImage.DATA_WIDTH, RadarImage.DATA_HEIGHT, RadarImage.DATA_CHANNELS])
+			validaImage = np.reshape(validaImage,
+						 [1, RadarImage.DATA_WIDTH, RadarImage.DATA_HEIGHT, RadarImage.DATA_CHANNELS])
 
 			validaAngle = self.validation_x_angle[i]
 			validaAngle = np.reshape(validaAngle, [1, 1])

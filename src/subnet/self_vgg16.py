@@ -72,7 +72,6 @@ class self_vgg16(SubnetBase):
 			totalImages = tf.stack( [imagesHH, imagesHV, imagesAngle] )
 			totalImages = tf.transpose(totalImages, [1, 2, 3, 0])
 			totalImages = tf.image.resize_images(totalImages, VGG_INPUT_SIZE)
-			totalImages = tf.cast(totalImages, tf.float16)
 
 			return  totalImages
 	
