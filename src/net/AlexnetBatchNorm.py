@@ -1,5 +1,5 @@
 import tensorflow as tf
-from src.subnet.SubnetBase import SubnetBase
+from src.net.SubnetBase import SubnetBase
 from src.layers.BasicLayers import *
 import settings.OutputSettings as outSettings
 
@@ -38,22 +38,21 @@ class AlexnetBatchNorm(SubnetBase):
 		net = MaxPoolLayer('Pool4', net, kernelSize_=2)
 
 		net = FullyConnectedLayer('Fc1', net, numberOfOutputs_=128)
-		net, updateVariablesOp5 = BatchNormalization('BN5', net, isConvLayer_=False,
+		net, updateVariablesOp1 = BatchNormalization('BN5', net, isConvLayer_=False,
 							     isTraining_=self.isTraining, currentStep_=self.trainingStep)
-		net = tf.nn.relu(net)
+		net = LeakyRELU('LeakyRELU1', net)
 
 		net = tf.cond(self.isTraining, lambda: tf.nn.dropout(net, self.dropoutValue), lambda: net)
 
 		net = FullyConnectedLayer('Fc2', net, numberOfOutputs_=128)
-		net, updateVariablesOp6 = BatchNormalization('BN6', net, isConvLayer_=False,
+		net, updateVariablesOp2 = BatchNormalization('BN6', net, isConvLayer_=False,
 							     isTraining_=self.isTraining, currentStep_=self.trainingStep)
-		net = tf.nn.relu(net)
+		net = LeakyRELU('LeakyRELU2', net)
 
 		net = tf.cond(self.isTraining, lambda: tf.nn.dropout(net, self.dropoutValue), lambda: net)
 
 		net = FullyConnectedLayer('Fc3', net, numberOfOutputs_=outSettings.NUMBER_OF_CATEGORIES)
 
-		updateVariablesOperations = tf.group(updateVariablesOp1, updateVariablesOp2, updateVariablesOp3,
-						    updateVariablesOp4, updateVariablesOp5, updateVariablesOp6)
+		updateVariablesOperations = tf.group(updateVariablesOp1, updateVariablesOp2)
 		return net, updateVariablesOperations
 

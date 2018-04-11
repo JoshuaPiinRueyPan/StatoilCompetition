@@ -1,13 +1,14 @@
 import numpy as np
 import tensorflow as tf
+from src.layers.BasicLayers import *
 
-from src.subnet.SubnetBase import SubnetBase
+from src.net.SubnetBase import SubnetBase
 
 VGG_MODEL_PATH = "data/VGG/vgg16.npy"
 
 VGG_INPUT_SIZE = [224, 224]
 
-class VGG16(SubnetBase):
+class VGG16BatchNorm(SubnetBase):
 	def __init__(self, isTraining_, trainingStep_, inputImage_, inputAngle_, groundTruth_):
 		self.isTraining = isTraining_
 		self.trainingStep = trainingStep_
@@ -28,42 +29,53 @@ class VGG16(SubnetBase):
 	def Build(self):
 		vggInput = self.transformInputToVGG_Input()
 
-		self.conv1_1 = self.conv_layer(vggInput, 3, 64, "conv1_1")
-		self.conv1_2 = self.conv_layer(self.conv1_1, 64, 64, "conv1_2")
-		self.pool1 = self.max_pool(self.conv1_2, 'pool1')
+		net = self.conv_layer(vggInput, 3, 64, "conv1_1")
+		net, updateOp1 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = self.conv_layer(net, 64, 64, "conv1_2")
+		net, updateOp2 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = self.max_pool(net, 'pool1')
 
-		self.conv2_1 = self.conv_layer(self.pool1, 64, 128, "conv2_1")
-		self.conv2_2 = self.conv_layer(self.conv2_1, 128, 128, "conv2_2")
-		self.pool2 = self.max_pool(self.conv2_2, 'pool2')
+		net = self.conv_layer(net, 64, 128, "conv2_1")
+		net, updateOp3 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = self.conv_layer(net, 128, 128, "conv2_2")
+		net, updateOp4 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = self.max_pool(net, 'pool2')
 
-		self.conv3_1 = self.conv_layer(self.pool2, 128, 256, "conv3_1")
-		self.conv3_2 = self.conv_layer(self.conv3_1, 256, 256, "conv3_2")
-		self.conv3_3 = self.conv_layer(self.conv3_2, 256, 256, "conv3_3")
-		self.pool3 = self.max_pool(self.conv3_3, 'pool3')
+		net = self.conv_layer(net, 128, 256, "conv3_1")
+		net, updateOp5 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = self.conv_layer(net, 256, 256, "conv3_2")
+		net, updateOp6 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = self.conv_layer(net, 256, 256, "conv3_3")
+		net, updateOp7 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = self.max_pool(net, 'pool3')
 
-		self.conv4_1 = self.conv_layer(self.pool3, 256, 512, "conv4_1")
-		self.conv4_2 = self.conv_layer(self.conv4_1, 512, 512, "conv4_2")
-		self.conv4_3 = self.conv_layer(self.conv4_2, 512, 512, "conv4_3")
-		self.pool4 = self.max_pool(self.conv4_3, 'pool4')
+		net = self.conv_layer(net, 256, 512, "conv4_1")
+		net, updateOp8 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = self.conv_layer(net, 512, 512, "conv4_2")
+		net, updateOp9 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = self.conv_layer(net, 512, 512, "conv4_3")
+		net, updateOp10 = BatchNormalization(self.isTraining, self.trainingStep, net, isConvLayer_=True)
+		net = self.max_pool(net, 'pool4')
 
-		self.conv5_1 = self.conv_layer(self.pool4, 512, 512, "conv5_1")
-		self.conv5_2 = self.conv_layer(self.conv5_1, 512, 512, "conv5_2")
-		self.conv5_3 = self.conv_layer(self.conv5_2, 512, 512, "conv5_3")
-		self.pool5 = self.max_pool(self.conv5_3, 'pool5')
+		net = self.conv_layer(net, 512, 512, "conv5_1")
+		net = self.conv_layer(net, 512, 512, "conv5_2")
+		net = self.conv_layer(net, 512, 512, "conv5_3")
+		net = self.max_pool(net, 'pool5')
 
-		self.fc6 = self.fc_layer(self.pool5, 25088, 4096, "fc6")  # 25088 = ((224 // (2 ** 5)) ** 2) * 512
-		self.relu6 = tf.nn.relu(self.fc6)
-		self.relu6 = tf.cond(self.isTraining, lambda: tf.nn.dropout(self.relu6, 0.5), lambda: self.relu6)
+		net = self.fc_layer(net, 25088, 4096, "fc6")  # 25088 = ((224 // (2 ** 5)) ** 2) * 512
+		net = tf.nn.relu(net)
+		net = tf.cond(self.isTraining, lambda: tf.nn.dropout(net, 0.5), lambda: net)
 
-		self.fc7 = self.fc_layer(self.relu6, 4096, 4096, "fc7")
-		self.relu7 = tf.nn.relu(self.fc7)
-		self.relu7 = tf.cond(self.isTraining, lambda: tf.nn.dropout(self.relu7, 0.5), lambda: self.relu7)
+		net = self.fc_layer(net, 4096, 4096, "fc7")
+		net = tf.nn.relu(net)
+		net = tf.cond(self.isTraining, lambda: tf.nn.dropout(net, 0.5), lambda: net)
 
-		#self.fc8 = self.fc_layer(self.relu7, 4096, 1000, "fc8")
-		fcFinal = self.fc_layer(self.relu7, 4096, 2, "fcFinal")
+		fcFinal = self.fc_layer(net, 4096, 2, "fcFinal")
 
+		updateOperations = tf.group(updateOp1, updateOp2, updateOp3, updateOp4, updateOp5,
+					    updateOp6, updateOp7, updateOp8, updateOp9, updateOp10)
 		self.data_dict = None
-		return fcFinal, tf.no_op()
+		return fcFinal, updateOperations
 
 
 	def transformInputToVGG_Input(self):

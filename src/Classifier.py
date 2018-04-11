@@ -4,7 +4,7 @@ import settings.OutputSettings as outSettings
 from settings.SubnetSettings import SubnetFactory
 import settings.TrainSettings as trainSettings
 
-class IceNet:
+class Classifier:
 	def __init__(self):
 		self.isTraining = tf.placeholder(tf.bool)
 		self.trainingStep = tf.placeholder(tf.int64)
@@ -13,10 +13,10 @@ class IceNet:
 		self.inputAngle = tf.placeholder(tf.float32, [None, 1])
 		self.groundTruth = tf.placeholder(tf.float32, [None, outSettings.NUMBER_OF_CATEGORIES])
 
-		self.subnet = SubnetFactory(self.isTraining, self.trainingStep, self.inputImage, self.inputAngle, self.groundTruth)
+		self.net = SubnetFactory(self.isTraining, self.trainingStep, self.inputImage, self.inputAngle, self.groundTruth)
 
 	def Build(self):
-		self.logits, updateSubnetOperation = self.subnet.Build()
+		self.logits, updateSubnetOperation = self.net.Build()
 		self.predictions = tf.nn.softmax(self.logits, name="tf.nn.softmax")
 		with tf.name_scope("calculateLoss"):
 			crossEntropy = tf.nn.softmax_cross_entropy_with_logits(logits=self.logits, labels=self.groundTruth,

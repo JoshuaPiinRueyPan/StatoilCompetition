@@ -3,13 +3,13 @@ import os
 import tensorflow as tf
 import numpy as np
 from src.DataManager import TestingDataManager
-from src.IceNet import *
+from src.Classifier import *
 import settings.TestSettings as testSettings
 import csv
 
 class Testing:
 	def __init__(self):
-		self.net = IceNet()
+		self.net = Classifier()
 		_ = self.net.Build()
 		print("Loading Test Set, please wait...")
 		self.dataManager = TestingDataManager(testSettings.TESTING_SET_PATH_NAME)

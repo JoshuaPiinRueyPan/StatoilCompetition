@@ -1,13 +1,13 @@
 import numpy as np
 import tensorflow as tf
 
-from src.subnet.SubnetBase import SubnetBase
+from src.net.SubnetBase import SubnetBase
 
-VGG_MODEL_PATH = "data/VGG/vgg19.npy"
+VGG_MODEL_PATH = "data/VGG/vgg16.npy"
 
 VGG_INPUT_SIZE = [224, 224]
 
-class VGG19(SubnetBase):
+class VGG16(SubnetBase):
 	def __init__(self, isTraining_, trainingStep_, inputImage_, inputAngle_, groundTruth_):
 		self.isTraining = isTraining_
 		self.trainingStep = trainingStep_
@@ -39,27 +39,21 @@ class VGG19(SubnetBase):
 		self.conv3_1 = self.conv_layer(self.pool2, 128, 256, "conv3_1")
 		self.conv3_2 = self.conv_layer(self.conv3_1, 256, 256, "conv3_2")
 		self.conv3_3 = self.conv_layer(self.conv3_2, 256, 256, "conv3_3")
-		self.conv3_4 = self.conv_layer(self.conv3_3, 256, 256, "conv3_4")
-		self.pool3 = self.max_pool(self.conv3_4, 'pool3')
+		self.pool3 = self.max_pool(self.conv3_3, 'pool3')
 
 		self.conv4_1 = self.conv_layer(self.pool3, 256, 512, "conv4_1")
 		self.conv4_2 = self.conv_layer(self.conv4_1, 512, 512, "conv4_2")
 		self.conv4_3 = self.conv_layer(self.conv4_2, 512, 512, "conv4_3")
-		self.conv4_4 = self.conv_layer(self.conv4_3, 512, 512, "conv4_4")
-		self.pool4 = self.max_pool(self.conv4_4, 'pool4')
+		self.pool4 = self.max_pool(self.conv4_3, 'pool4')
 
 		self.conv5_1 = self.conv_layer(self.pool4, 512, 512, "conv5_1")
 		self.conv5_2 = self.conv_layer(self.conv5_1, 512, 512, "conv5_2")
 		self.conv5_3 = self.conv_layer(self.conv5_2, 512, 512, "conv5_3")
-		self.conv5_4 = self.conv_layer(self.conv5_3, 512, 512, "conv5_4")
-		self.pool5 = self.max_pool(self.conv5_4, 'pool5')
+		self.pool5 = self.max_pool(self.conv5_3, 'pool5')
 
 		self.fc6 = self.fc_layer(self.pool5, 25088, 4096, "fc6")  # 25088 = ((224 // (2 ** 5)) ** 2) * 512
 		self.relu6 = tf.nn.relu(self.fc6)
-
-
 		self.relu6 = tf.cond(self.isTraining, lambda: tf.nn.dropout(self.relu6, 0.5), lambda: self.relu6)
-
 
 		self.fc7 = self.fc_layer(self.relu6, 4096, 4096, "fc7")
 		self.relu7 = tf.nn.relu(self.fc7)

@@ -25,8 +25,8 @@ def Create_tfVariable(variableName_, initialValue_, isTrainable_, doesRegularize
 	return tf_variable
 
 
-def CreateConvVariables(layerName_, filterSize_, inputChannels, numberOfFilters_, isTrainable_):
-	with tf.name_scope(layerName_):
+def CreateConvVariables(name_, filterSize_, inputChannels, numberOfFilters_, isTrainable_):
+	with tf.name_scope(name_):
 		weightsValue = tf.truncated_normal([filterSize_, filterSize_, inputChannels, numberOfFilters_],
 						   mean=layerSettings.CONV_WEIGHTS_RNDOM_MEAN,
 						   stddev=layerSettings.CONV_WEIGHTS_RNDOM_DEVIATION,
@@ -42,8 +42,8 @@ def CreateConvVariables(layerName_, filterSize_, inputChannels, numberOfFilters_
 		return weights, biases
 
 
-def CreateFcVariables(layerName_, numberOfInputs_, numberOfOutputs_, isTrainable_):
-	with tf.name_scope(layerName_):
+def CreateFcVariables(name_, numberOfInputs_, numberOfOutputs_, isTrainable_):
+	with tf.name_scope(name_):
 		weightsValue = tf.truncated_normal([numberOfInputs_, numberOfOutputs_],
 						   mean=layerSettings.FC_WEIGHTS_RANDOM_MEAN,
 						   stddev=layerSettings.FC_WEIGHTS_RANDOM_DEVIATION,

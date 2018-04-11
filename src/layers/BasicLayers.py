@@ -2,8 +2,8 @@ import tensorflow as tf
 import src.layers.LayerHelper as LayerHelper
 import settings.LayerSettings as layerSettings
 
-def ConvLayer(layerName_, inputTensor_, filterSize_, numberOfFilters_, stride_=1, padding_='SAME', isTrainable_=True):
-	with tf.name_scope(layerName_):
+def ConvLayer(name_, inputTensor_, filterSize_, numberOfFilters_, stride_=1, padding_='SAME', isTrainable_=True):
+	with tf.name_scope(name_):
 		inputChannels = int(inputTensor_.shape[3])
 		weights, biases = LayerHelper.CreateConvVariables("CreateConvVariables", filterSize_,
 								  inputChannels, numberOfFilters_, isTrainable_)
@@ -17,8 +17,8 @@ def ConvLayer(layerName_, inputTensor_, filterSize_, numberOfFilters_, stride_=1
 
 		return outputTensor
 
-def FullyConnectedLayer(layerName_, inputTensor_, numberOfOutputs_, isTrainable_=True):
-	with tf.name_scope(layerName_):
+def FullyConnectedLayer(name_, inputTensor_, numberOfOutputs_, isTrainable_=True):
+	with tf.name_scope(name_):
 		numberOfInputs = LayerHelper.CountElementsInOneFeatureMap(inputTensor_)
 		inputTensor_ = tf.reshape(inputTensor_, [-1, numberOfInputs], name="flatten")
 		weights, biases = LayerHelper.CreateFcVariables("CreateFcVariables", numberOfInputs, numberOfOutputs_, isTrainable_)
@@ -31,37 +31,37 @@ def FullyConnectedLayer(layerName_, inputTensor_, numberOfOutputs_, isTrainable_
 
 		return output
 
-def LeakyRELU(layerName_, inputTensor_):
-	return tf.maximum(layerSettings.LEAKY_RELU_FACTOR*inputTensor_, inputTensor_, name=layerName_)
+def LeakyRELU(name_, inputTensor_):
+	return tf.maximum(layerSettings.LEAKY_RELU_FACTOR*inputTensor_, inputTensor_, name=name_)
 
-def SetActivation(layerName_, inputTensor_, activationType_):
+def SetActivation(name_, inputTensor_, activationType_):
 	if activationType_.upper() == "RELU":
-		return tf.nn.relu(inputTensor_, layerName_)
+		return tf.nn.relu(inputTensor_, name_)
 
 	elif activationType_.upper() == "LEAKY_RELU":
-		return LeakyRELU(layerName_, inputTensor_)
+		return LeakyRELU(name_, inputTensor_)
 
 	else:
 		errorMessage = "You may add a new Activation type: '" + activationType_.upper() + "'\n"
 		errorMessage += "but not implement in SetActivation()"
 		raise ValueError(errorMessage)
 
-def AlexNorm(layerName_, inputTensor, lsize=4):
-	return tf.nn.lrn(inputTensor, lsize, bias=1.0, alpha=0.001/9.0, beta=0.75, name=layerName_)
+def AlexNorm(name_, inputTensor, lsize=4):
+	return tf.nn.lrn(inputTensor, lsize, bias=1.0, alpha=0.001/9.0, beta=0.75, name=name_)
 
-def MaxPoolLayer(layerName_, inputTensor_, kernelSize_=2, stride_=2, padding_='SAME'):
+def MaxPoolLayer(name_, inputTensor_, kernelSize_=2, stride_=2, padding_='SAME'):
 	return tf.nn.max_pool(inputTensor_, ksize=[1, kernelSize_, kernelSize_, 1],
-				 strides=[1, stride_, stride_, 1], padding=padding_, name=layerName_)
+				 strides=[1, stride_, stride_, 1], padding=padding_, name=name_)
 
 
-def AvgPoolLayer(layerName_, inputTensor_, kernelSize_=2, stride_=2, padding_='SAME'):
+def AvgPoolLayer(name_, inputTensor_, kernelSize_=2, stride_=2, padding_='SAME'):
 	return tf.nn.avg_pool(inputTensor_, ksize=[1, kernelSize_, kernelSize_, 1],
 				 strides=[1, stride_, stride_, 1],
 				 padding=padding_,
-				 name=layerName_)
+				 name=name_)
 
-def BatchNormalization(layerName_, inputTensor_, isConvLayer_, isTraining_, currentStep_, isTrainable_=True):
-	with tf.name_scope(layerName_):
+def BatchNormalization(name_, inputTensor_, isConvLayer_, isTraining_, currentStep_, isTrainable_=True):
+	with tf.name_scope(name_):
 		currentBatchMean = None
 		currentBatchVariance = None
 		outputChannels = None

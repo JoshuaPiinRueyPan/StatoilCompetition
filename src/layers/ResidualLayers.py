@@ -1,8 +1,8 @@
 from src.layers.BasicLayers import *
 
 
-def ResidualBlock(layerName_, inputTensor_, listOfConvFilterSize_, isTraining_, trainingStep_, activationType_="RELU", isTrainable_=True):
-	with tf.name_scope(layerName_):
+def ResidualBlock(name_, inputTensor_, listOfConvFilterSize_, isTraining_, trainingStep_, activationType_="RELU", isTrainable_=True):
+	with tf.name_scope(name_):
 		'''
 		    This function will create Residual Block as follows:
 		    (supposed that listOfConvFilterSize_ = [a, b, c])
@@ -57,9 +57,9 @@ def ResidualBlock(layerName_, inputTensor_, listOfConvFilterSize_, isTraining_, 
 			raise ValueError(errorMessage)
 
 
-def ResidualHeadBlock(layerName_, inputTensor_, listOfConvFilterSize_, isTraining_, trainingStep_,
+def ResidualHeadBlock(name_, inputTensor_, listOfConvFilterSize_, isTraining_, trainingStep_,
 								 activationType_="RELU", isTrainable_=True):
-	with tf.name_scope(layerName_):
+	with tf.name_scope(name_):
 		'''
 		    This function will create Residual Head Block as follows:
 		    (supposed that listOfConvFilterSize_ = [a, b, c])
@@ -123,9 +123,9 @@ def ResidualHeadBlock(layerName_, inputTensor_, listOfConvFilterSize_, isTrainin
 
 
 
-def ResidualLayer(layerName_, inputTensor_, numberOfResidualBlocks_, listOfConvFilterSize_,
+def ResidualLayer(name_, inputTensor_, numberOfResidualBlocks_, listOfConvFilterSize_,
 		  isTraining_, trainingStep_, activationType_="RELU", isTrainable_=True):
-	with tf.name_scope(layerName_):
+	with tf.name_scope(name_):
 		'''
 		    This function is the wrapper that use the above block to build the Layers in ResNet.
 		    The ResLayer has following configuration:

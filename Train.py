@@ -4,7 +4,7 @@ import tensorflow as tf
 import numpy as np
 import src.RadarImage
 from src.DataManager import TrainingDataManager
-from src.IceNet import *
+from src.Classifier import *
 import settings.TrainSettings as trainSettings
 import src.layers.LayerHelper as LayerHelper
 
@@ -15,7 +15,7 @@ class Solver:
 		self.validation_x, self.validation_x_angle, self.validation_y = self.dataManager.GetValidationSet()
 
 		# Net
-		self.net = IceNet()
+		self.net = Classifier()
 		self.lossOp, self.accuracyOp, self.updateNetOp = self.net.Build()
 
 		# Optimizer
