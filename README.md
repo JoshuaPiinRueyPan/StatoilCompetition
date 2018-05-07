@@ -1,6 +1,10 @@
 # Statoil Iceberg Recognition Development Platform
 This package provide some basic utilities (such as data loading, data drawing, several basic layers... etc) that facilitate the design of network for Statoil Iceberg Competition.
 
+Note:  This project is originally developed [here](https://github.com/waynexhsieh/Statoil-C-CORE-Iceberg-Classifier-Challenge-with-myNet).
+After the competition finished, I still maintain this project due to its small size dataset that can varify the design of network
+quickly.  However, after several interface changed, I decide to detach it from the original site.
+
 ## Requirements
 1. Tensorflow
 2. opencv
